@@ -12,13 +12,14 @@ import { UserInfoActionsContext, UserInfoContext } from "../userInfo/UserInfoCon
 interface Props {
     status: Status
     index: number
+    pageUrl: String
 }
 
 
 const StatusItem = (props: Props) => {
     const { displayToast } = useContext(ToastActionsContext);
-    const navigate = useNavigate();
     const { displayedUser, authToken } = useContext(UserInfoContext);
+    const navigate = useNavigate();
     const { setDisplayedUser } = useContext(UserInfoActionsContext);
 
     const extractAlias = (value: string): string => {
@@ -46,7 +47,7 @@ const StatusItem = (props: Props) => {
       if (toUser) {
         if (!toUser.equals(displayedUser!)) {
           setDisplayedUser(toUser);
-          navigate(`/feed/${toUser.alias}`);
+          navigate(`/${props.pageUrl}/${toUser.alias}`);
         }
       }
     } catch (error) {

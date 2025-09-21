@@ -102,7 +102,7 @@ const StoryScroller = () => {
         loader={<h4>Loading...</h4>}
       >
         {items.map((item, index) => (
-          <StatusItem status={item} index={index} />
+          <StatusItem status={item} index={index} pageUrl={"story"} />
         ))}
       </InfiniteScroll>
     </div>
