@@ -1,5 +1,3 @@
-// Component to ...
-
 import { Link, useNavigate } from "react-router-dom";
 import Post from "./Post";
 import { AuthToken, FakeData, Status, User } from "tweeter-shared";
@@ -81,7 +79,7 @@ const StatusItem = (props: Props) => {
                         {props.status.user.firstName} {props.status.user.lastName}
                       </b>{" "}
                       -{" "}
-                      <Link
+                      <Link // TODO
                         to={`/story/${props.status.user.alias}`}
                         onClick={navigateToUser}
                       >
@@ -89,9 +87,9 @@ const StatusItem = (props: Props) => {
                       </Link>
                     </h2>
                     {props.status.formattedDate}
-                    <br />
-                    <Post status={props.status} featurePath="/story" />
-                  </div>
+                    <br /> 
+                    <Post /* TODO */ status={props.status} featurePath="/story" /> 
+                  </div> 
                 </div>
               </div>
             </div>
@@ -99,4 +97,4 @@ const StatusItem = (props: Props) => {
     );
 }
 
-export default StatusItem
+export default StatusItem;
