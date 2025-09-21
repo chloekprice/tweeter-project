@@ -79,8 +79,8 @@ const StatusItem = (props: Props) => {
                         {props.status.user.firstName} {props.status.user.lastName}
                       </b>{" "}
                       -{" "}
-                      <Link // TODO
-                        to={`/story/${props.status.user.alias}`}
+                      <Link
+                        to={`/${props.pageUrl}/${props.status.user.alias}`}
                         onClick={navigateToUser}
                       >
                         {props.status.user.alias}
@@ -88,7 +88,7 @@ const StatusItem = (props: Props) => {
                     </h2>
                     {props.status.formattedDate}
                     <br /> 
-                    <Post /* TODO */ status={props.status} featurePath="/story" /> 
+                    <Post status={props.status} featurePath={`/${props.pageUrl}`} /> 
                   </div> 
                 </div>
               </div>
