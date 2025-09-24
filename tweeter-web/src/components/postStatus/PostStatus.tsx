@@ -1,14 +1,13 @@
 import "./PostStatus.css";
 import { useState } from "react";
-import { useContext } from "react";
-import { UserInfoContext } from "../userInfo/UserInfoContexts";
 import { AuthToken, Status } from "tweeter-shared";
 import { useMessageActions } from "../toaster/MessageHooks";
+import { useUserInfo } from "../userInfo/UserInfoHooks";
 
 const PostStatus = () => {
   const { displayInfoMsg, displayErrorMsg, deleteMsg } = useMessageActions();
 
-  const { currentUser, authToken } = useContext(UserInfoContext);
+  const userInfo = useUserInfo();
   const [post, setPost] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -24,9 +23,9 @@ const PostStatus = () => {
         0
       );
 
-      const status = new Status(post, currentUser!, Date.now());
+      const status = new Status(post, userInfo.currentUser!, Date.now());
 
-      await postStatus(authToken!, status);
+      await postStatus(userInfo.authToken!, status);
 
       setPost("");
       displayInfoMsg("Status posted!", 2000);
@@ -56,7 +55,7 @@ const PostStatus = () => {
   };
 
   const checkButtonStatus: () => boolean = () => {
-    return !post.trim() || !authToken || !currentUser;
+    return !post.trim() || !userInfo.authToken || !userInfo.currentUser;
   };
 
   return (
