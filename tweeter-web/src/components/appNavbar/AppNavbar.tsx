@@ -1,8 +1,4 @@
 import "./AppNavbar.css";
-import { useContext } from "react";
-import {
-  UserInfoContext,
-} from "../userInfo/UserInfoContexts";
 import { Container, Nav, Navbar } from "react-bootstrap";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import Image from "react-bootstrap/Image";
