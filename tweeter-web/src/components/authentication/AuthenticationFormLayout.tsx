@@ -1,7 +1,5 @@
-import { useContext } from "react";
-import { ToastActionsContext } from "../toaster/ToastContexts";
-import { ToastType } from "../toaster/Toast";
 import OAuth from "./OAuth";
+import { useMessageActions } from "../toaster/MessageHooks";
 
 interface Props {
   headingText: string;
@@ -16,14 +14,12 @@ interface Props {
 }
 
 const AuthenticationFormLayout = (props: Props) => {
-  const { displayToast } = useContext(ToastActionsContext);
+  const { displayInfoMsg } = useMessageActions();
 
   const displayInfoMessageWithDarkBackground = (message: string): void => {
-    displayToast(
-      ToastType.Info,
+    displayInfoMsg(
       message,
       3000,
-      undefined,
       "text-white bg-primary"
     );
   };
