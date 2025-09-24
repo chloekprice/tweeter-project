@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthToken, User, FakeData } from "tweeter-shared";
 import { useUserInfo, useUserInfoActions } from "../userInfo/UserInfoHooks";
 import { useMessageActions } from "../toaster/MessageHooks";
+import { useCallback } from "react";
 
 interface NavigateToUserData {
     featurePath: String
@@ -10,30 +11,35 @@ interface NavigateToUserData {
 
 const navigate = useNavigate();
 
-const navigateToUser = async (event: React.MouseEvent, data: NavigateToUserData): Promise<void> => {
-    const userInfo = useUserInfo();
-    const { set } = useUserInfoActions();
-    const { displayErrorMsg } = useMessageActions();
+function useNavigateToUser() {
+    
+    const navigateToUser = useCallback( async (event: React.MouseEvent, data: NavigateToUserData): Promise<void> => {
+        const userInfo = useUserInfo();
+        const { set } = useUserInfoActions();
+        const { displayErrorMsg } = useMessageActions();
 
 
-    event.preventDefault();
+        event.preventDefault();
 
-    try {
-        const alias = extractAlias(event.target.toString());
-        const toUser = await getUser(userInfo.authToken!, alias);
+        try {
+            const alias = extractAlias(event.target.toString());
+            const toUser = await getUser(userInfo.authToken!, alias);
 
-        if (toUser) {
-            if (!toUser.equals(userInfo.displayedUser!)) {
-                set(toUser);
-                navigate(`${data.featurePath}/${toUser.alias}`);
+            if (toUser) {
+                if (!toUser.equals(userInfo.displayedUser!)) {
+                    set(toUser);
+                    navigate(`${data.featurePath}/${toUser.alias}`);
+                }
             }
+        } catch (error) {
+            displayErrorMsg(
+            `Failed to get user because of exception: ${error}`,
+            );
         }
-    } catch (error) {
-        displayErrorMsg(
-        `Failed to get user because of exception: ${error}`,
-        );
-    }
-};
+    }, []);
+
+    return { navigateToUser }
+}
 
 const extractAlias = (value: string): string => {
     const index = value.indexOf("@");
@@ -49,6 +55,4 @@ const getUser = async (
 };
 
 
-export const useNavigateToUser = (event: React.MouseEvent, data: NavigateToUserData): Promise<void> => {
-    return navigateToUser(event, data);
-}
+export default useNavigateToUser;

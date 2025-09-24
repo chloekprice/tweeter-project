@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Status, Type } from "tweeter-shared";
-import { useNavigateToUser } from "../userItem/NavigateHooks";
+import useNavigateToUser from "../userItem/NavigateHooks";
 
 interface Props {
   status: Status;
@@ -8,7 +8,7 @@ interface Props {
 }
 
 const Post = (props: Props) => {
-  const navigateToUser = useNavigateToUser;
+  const { navigateToUser } = useNavigateToUser();
 
   return (
     <>

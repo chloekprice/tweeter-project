@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { User } from "tweeter-shared";
-import { useNavigateToUser } from "./NavigateHooks";
+import useNavigateToUser from "./NavigateHooks";
+
 
 interface Props {
   user: User;
@@ -8,7 +9,7 @@ interface Props {
 }
 
 const UserItem = (props: Props) => {
-  const navigateToUser = useNavigateToUser;
+  const { navigateToUser } = useNavigateToUser();
 
   return (
     <div className="col bg-light mx-0 px-0">
