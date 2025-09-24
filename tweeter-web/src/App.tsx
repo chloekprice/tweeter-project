@@ -1,6 +1,4 @@
 import "./App.css";
-import { useContext } from "react";
-import { UserInfoContext } from "./components/userInfo/UserInfoContexts";
 import {
   BrowserRouter,
   Navigate,
@@ -15,12 +13,13 @@ import Toaster from "./components/toaster/Toaster";
 import UserItemScroller from "./components/mainLayout/UserItemScroller";
 import { AuthToken, FakeData, Status, User } from "tweeter-shared";
 import StatusItemScroller from "./components/mainLayout/StatusItemScroller";
+import { useUserInfo } from "./components/userInfo/UserInfoHooks";
 
 const App = () => {
-  const { currentUser, authToken } = useContext(UserInfoContext);
+  const userInfo = useUserInfo();
 
   const isAuthenticated = (): boolean => {
-    return !!currentUser && !!authToken;
+    return !!userInfo.currentUser && !!userInfo.authToken;
   };
 
   return (
@@ -38,7 +37,7 @@ const App = () => {
 };
 
 const AuthenticatedRoutes = () => {
-  const { displayedUser } = useContext(UserInfoContext);
+  const userInfo = useUserInfo();
 
 
   const loadMoreFeedItems = async (
@@ -85,26 +84,26 @@ const AuthenticatedRoutes = () => {
   return (
     <Routes>
       <Route element={<MainLayout />}>
-        <Route index element={<Navigate to={`/feed/${displayedUser!.alias}`} />} />
+        <Route index element={<Navigate to={`/feed/${userInfo.displayedUser!.alias}`} />} />
         <Route 
           path="feed/:displayedUser" 
-          element={<StatusItemScroller key={`/feed/${displayedUser!.alias}`} itemDescription={"feed"} urlPath={"feed"} loadMore={loadMoreFeedItems} /> }
+          element={<StatusItemScroller key={`/feed/${userInfo.displayedUser!.alias}`} itemDescription={"feed"} urlPath={"feed"} loadMore={loadMoreFeedItems} /> }
         />
         <Route 
           path="story/:displayedUser" 
-          element={<StatusItemScroller key={`/story/${displayedUser!.alias}`} itemDescription={"story"} urlPath={"story"} loadMore={loadMoreStoryItems} /> }
+          element={<StatusItemScroller key={`/story/${userInfo.displayedUser!.alias}`} itemDescription={"story"} urlPath={"story"} loadMore={loadMoreStoryItems} /> }
         />
         <Route 
           path="followees/:displayedUser" 
           element={
-            <UserItemScroller key={`followees-${displayedUser!.alias}`} itemDescription={"followees"} featureURL={"/followees"} loadMore={loadMoreFollowees} /> } 
+            <UserItemScroller key={`followees-${userInfo.displayedUser!.alias}`} itemDescription={"followees"} featureURL={"/followees"} loadMore={loadMoreFollowees} /> } 
         />
         <Route
           path="followers/:displayedUser" 
-          element={<UserItemScroller key={`followers-${displayedUser!.alias}`} itemDescription={"followers"} featureURL={"/followers"} loadMore={loadMoreFollowers} /> } 
+          element={<UserItemScroller key={`followers-${userInfo.displayedUser!.alias}`} itemDescription={"followers"} featureURL={"/followers"} loadMore={loadMoreFollowers} /> } 
         />
         <Route path="logout" element={<Navigate to="/login" />} />
-        <Route path="*" element={<Navigate to={`/feed/${displayedUser!.alias}`} />} />
+        <Route path="*" element={<Navigate to={`/feed/${userInfo.displayedUser!.alias}`} />} />
       </Route>
     </Routes>
   );
