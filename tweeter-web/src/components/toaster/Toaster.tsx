@@ -1,20 +1,19 @@
 import "./Toaster.css";
 import { useEffect } from "react";
-import { useContext } from "react";
-import { ToastListContext, ToastActionsContext } from "./ToastContexts";
 import { Toast } from "react-bootstrap";
+import { useMessageActions, useMessageList } from "./MessageHooks";
 
 interface Props {
   position: string;
 }
 
 const Toaster = ({ position }: Props) => {
-  const toastList = useContext(ToastListContext);
-  const { deleteToast } = useContext(ToastActionsContext);
+  const msgList = useMessageList();
+  const { deleteMsg } = useMessageActions();
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (toastList.length) {
+      if (msgList.length) {
         deleteExpiredToasts();
       }
     }, 1000);
@@ -23,17 +22,17 @@ const Toaster = ({ position }: Props) => {
       clearInterval(interval);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [toastList]);
+  }, [msgList]);
 
   const deleteExpiredToasts = () => {
     const now = Date.now();
 
-    for (let toast of toastList) {
+    for (let msg of msgList) {
       if (
-        toast.expirationMillisecond > 0 &&
-        toast.expirationMillisecond < now
+        msg.expirationMillisecond > 0 &&
+        msg.expirationMillisecond < now
       ) {
-        deleteToast(toast.id);
+        deleteMsg(msg.id);
       }
     }
   };
@@ -41,14 +40,14 @@ const Toaster = ({ position }: Props) => {
   return (
     <>
       <div className={`toaster-container ${position}`}>
-        {toastList.map((toast, i) => (
+        {msgList.map((msg, i) => (
           <Toast
-            id={toast.id}
+            id={msg.id}
             key={i}
-            className={toast.bootstrapClasses}
+            className={msg.bootstrapClasses}
             autohide={false}
             show={true}
-            onClose={() => deleteToast(toast.id)}
+            onClose={() => deleteMsg(msg.id)}
           >
             <Toast.Header>
               <img
@@ -56,9 +55,9 @@ const Toaster = ({ position }: Props) => {
                 className="rounded me-2"
                 alt=""
               />
-              <strong className="me-auto">{toast.title}</strong>
+              <strong className="me-auto">{msg.title}</strong>
             </Toast.Header>
-            <Toast.Body>{toast.text}</Toast.Body>
+            <Toast.Body>{msg.text}</Toast.Body>
           </Toast>
         ))}
       </div>
