@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 
 interface Props {
     onEnter: (event: React.KeyboardEvent<HTMLElement>) => void
