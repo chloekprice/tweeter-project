@@ -8,10 +8,8 @@ interface NavigateToUserData {
     featurePath: String
 }
 
-
-const navigate = useNavigate();
-
 function useNavigateToUser() {
+    const navigate = useNavigate();
     
     const navigateToUser = useCallback( async (event: React.MouseEvent, data: NavigateToUserData): Promise<void> => {
         const userInfo = useUserInfo();
