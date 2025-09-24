@@ -1,9 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 import Post from "./Post";
 import { AuthToken, FakeData, Status, User } from "tweeter-shared";
-import { useContext } from "react";
-import { UserInfoActionsContext, UserInfoContext } from "../userInfo/UserInfoContexts";
 import { useMessageActions } from "../toaster/MessageHooks";
+import { useUserInfo, useUserInfoActions } from "../userInfo/UserInfoHooks";
 
 
 interface Props {
@@ -15,9 +14,9 @@ interface Props {
 
 const StatusItem = (props: Props) => {
     const { displayErrorMsg } = useMessageActions();
-    const { displayedUser, authToken } = useContext(UserInfoContext);
+    const userInfo = useUserInfo()
     const navigate = useNavigate();
-    const { setDisplayedUser } = useContext(UserInfoActionsContext);
+    const { set } = useUserInfoActions();
 
     const extractAlias = (value: string): string => {
         const index = value.indexOf("@");
@@ -39,11 +38,11 @@ const StatusItem = (props: Props) => {
     try {
       const alias = extractAlias(event.target.toString());
 
-      const toUser = await getUser(authToken!, alias);
+      const toUser = await getUser(userInfo.authToken!, alias);
 
       if (toUser) {
-        if (!toUser.equals(displayedUser!)) {
-          setDisplayedUser(toUser);
+        if (!toUser.equals(userInfo.displayedUser!)) {
+          set(toUser);
           navigate(`/${props.pageUrl}/${toUser.alias}`);
         }
       }

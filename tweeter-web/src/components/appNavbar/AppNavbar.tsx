@@ -2,18 +2,18 @@ import "./AppNavbar.css";
 import { useContext } from "react";
 import {
   UserInfoContext,
-  UserInfoActionsContext,
 } from "../userInfo/UserInfoContexts";
 import { Container, Nav, Navbar } from "react-bootstrap";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import Image from "react-bootstrap/Image";
 import { AuthToken } from "tweeter-shared";
 import { useMessageActions } from "../toaster/MessageHooks";
+import { useUserInfo, useUserInfoActions } from "../userInfo/UserInfoHooks";
 
 const AppNavbar = () => {
   const location = useLocation();
-  const { authToken, displayedUser } = useContext(UserInfoContext);
-  const { clearUserInfo } = useContext(UserInfoActionsContext);
+  const userInfo = useUserInfo();
+  const { clear } = useUserInfoActions();
   const navigate = useNavigate();
   const { displayInfoMsg, displayErrorMsg, deleteMsg } = useMessageActions();
 
@@ -21,10 +21,10 @@ const AppNavbar = () => {
     const loggingOutToastId = displayInfoMsg("Logging Out...", 0);
 
     try {
-      await logout(authToken!);
+      await logout(userInfo.authToken!);
 
       deleteMsg(loggingOutToastId);
-      clearUserInfo();
+      clear();
       navigate("/login");
     } catch (error) {
       displayErrorMsg(
@@ -66,7 +66,7 @@ const AppNavbar = () => {
           <Nav className="ml-auto">
             <Nav.Item>
               <NavLink
-                to={`/feed/${displayedUser!.alias}`}
+                to={`/feed/${userInfo.displayedUser!.alias}`}
                 className={() =>
                   location.pathname.startsWith("/feed/")
                     ? "nav-link active"
@@ -78,7 +78,7 @@ const AppNavbar = () => {
             </Nav.Item>
             <Nav.Item>
               <NavLink
-                to={`/story/${displayedUser!.alias}`}
+                to={`/story/${userInfo.displayedUser!.alias}`}
                 className={() =>
                   location.pathname.startsWith("/story/")
                     ? "nav-link active"
@@ -90,7 +90,7 @@ const AppNavbar = () => {
             </Nav.Item>
             <Nav.Item>
               <NavLink
-                to={`/followees/${displayedUser!.alias}`}
+                to={`/followees/${userInfo.displayedUser!.alias}`}
                 className={() =>
                   location.pathname.startsWith("/followees/")
                     ? "nav-link active"
@@ -102,7 +102,7 @@ const AppNavbar = () => {
             </Nav.Item>
             <Nav.Item>
               <NavLink
-                to={`/followers/${displayedUser!.alias}`}
+                to={`/followers/${userInfo.displayedUser!.alias}`}
                 className={() =>
                   location.pathname.startsWith("/followers/")
                     ? "nav-link active"

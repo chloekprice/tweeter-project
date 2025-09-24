@@ -1,14 +1,10 @@
-import { useContext } from "react";
-import {
-  UserInfoContext,
-  UserInfoActionsContext,
-} from "../userInfo/UserInfoContexts";
 import { AuthToken, FakeData, Status, User } from "tweeter-shared";
 import { useState, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useParams } from "react-router-dom";
 import StatusItem from "../statusItem/StatusItem";
 import { useMessageActions } from "../toaster/MessageHooks";
+import { useUserInfo, useUserInfoActions } from "../userInfo/UserInfoHooks";
 
 export const PAGE_SIZE = 10;
 
@@ -33,20 +29,20 @@ const StatusItemScroller = (props: Props) => {
   const addItems = (newItems: Status[]) =>
     setItems((previousItems) => [...previousItems, ...newItems]);
 
-  const { displayedUser, authToken } = useContext(UserInfoContext);
-  const { setDisplayedUser } = useContext(UserInfoActionsContext);
+  const userInfo  = useUserInfo();
+  const { set } = useUserInfoActions();
   const { displayedUser: displayedUserAliasParam } = useParams();
 
   // Update the displayed user context variable whenever the displayedUser url parameter changes. This allows browser forward and back buttons to work correctly.
   useEffect(() => {
     if (
-      authToken &&
+      userInfo.authToken &&
       displayedUserAliasParam &&
-      displayedUserAliasParam != displayedUser!.alias
+      displayedUserAliasParam != userInfo.displayedUser!.alias
     ) {
-      getUser(authToken!, displayedUserAliasParam!).then((toUser) => {
+      getUser(userInfo.authToken!, displayedUserAliasParam!).then((toUser) => {
         if (toUser) {
-          setDisplayedUser(toUser);
+          set(toUser);
         }
       });
     }
@@ -56,7 +52,7 @@ const StatusItemScroller = (props: Props) => {
   useEffect(() => {
     reset();
     loadMoreItems(null);
-  }, [displayedUser]);
+  }, [userInfo.displayedUser]);
 
   const reset = async () => {
     setItems(() => []);
@@ -67,8 +63,8 @@ const StatusItemScroller = (props: Props) => {
   const loadMoreItems = async (lastItem: Status | null) => {
     try {
       const [newItems, hasMore] = await props.loadMore(
-        authToken!,
-        displayedUser!.alias,
+        userInfo.authToken!,
+        userInfo.displayedUser!.alias,
         PAGE_SIZE,
         lastItem
       );

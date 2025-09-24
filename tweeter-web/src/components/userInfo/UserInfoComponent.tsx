@@ -1,10 +1,9 @@
 import "./UserInfoComponent.css";
-import { useContext } from "react";
-import { UserInfoContext, UserInfoActionsContext } from "./UserInfoContexts";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthToken, FakeData, User } from "tweeter-shared";
 import { useMessageActions } from "../toaster/MessageHooks";
+import { useUserInfo, useUserInfoActions } from "./UserInfoHooks";
 
 const UserInfo = () => {
   const [isFollower, setIsFollower] = useState(false);
@@ -14,20 +13,20 @@ const UserInfo = () => {
 
   const { displayInfoMsg, displayErrorMsg, deleteMsg } = useMessageActions();
 
-  const { currentUser, authToken, displayedUser } = useContext(UserInfoContext);
-  const { setDisplayedUser } = useContext(UserInfoActionsContext);
+  const userInfo = useUserInfo();
+  const { set } = useUserInfoActions();
   const navigate = useNavigate();
   const location = useLocation();
 
-  if (!displayedUser) {
-    setDisplayedUser(currentUser!);
+  if (!userInfo.displayedUser) {
+    set(userInfo.currentUser!);
   }
 
   useEffect(() => {
-    setIsFollowerStatus(authToken!, currentUser!, displayedUser!);
-    setNumbFollowees(authToken!, displayedUser!);
-    setNumbFollowers(authToken!, displayedUser!);
-  }, [displayedUser]);
+    setIsFollowerStatus(userInfo.authToken!, userInfo.currentUser!, userInfo.displayedUser!);
+    setNumbFollowees(userInfo.authToken!, userInfo.displayedUser!);
+    setNumbFollowers(userInfo.authToken!, userInfo.displayedUser!);
+  }, [userInfo.displayedUser]);
 
   const setIsFollowerStatus = async (
     authToken: AuthToken,
@@ -102,8 +101,8 @@ const UserInfo = () => {
 
   const switchToLoggedInUser = (event: React.MouseEvent): void => {
     event.preventDefault();
-    setDisplayedUser(currentUser!);
-    navigate(`${getBaseUrl()}/${currentUser!.alias}`);
+    set(userInfo.currentUser!);
+    navigate(`${getBaseUrl()}/${userInfo.currentUser!.alias}`);
   };
 
   const getBaseUrl = (): string => {
@@ -121,13 +120,13 @@ const UserInfo = () => {
     try {
       setIsLoading(true);
       followingUserToast = displayInfoMsg(
-        `Following ${displayedUser!.name}...`,
+        `Following ${userInfo.displayedUser!.name}...`,
         0
       );
 
       const [followerCount, followeeCount] = await follow(
-        authToken!,
-        displayedUser!
+        userInfo.authToken!,
+        userInfo.displayedUser!
       );
 
       setIsFollower(true);
@@ -168,13 +167,13 @@ const UserInfo = () => {
     try {
       setIsLoading(true);
       unfollowingUserToast = displayInfoMsg(
-        `Unfollowing ${displayedUser!.name}...`,
+        `Unfollowing ${userInfo.displayedUser!.name}...`,
         0
       );
 
       const [followerCount, followeeCount] = await unfollow(
-        authToken!,
-        displayedUser!
+        userInfo.authToken!,
+        userInfo.displayedUser!
       );
 
       setIsFollower(false);
@@ -207,25 +206,25 @@ const UserInfo = () => {
 
   return (
     <>
-      {currentUser === null || displayedUser === null || authToken === null ? (
+      {userInfo.currentUser === null || userInfo.displayedUser === null || userInfo.authToken === null ? (
         <></>
       ) : (
         <div className="container">
           <div className="row">
             <div className="col-auto p-3">
               <img
-                src={displayedUser.imageUrl}
+                src={userInfo.displayedUser.imageUrl}
                 className="img-fluid"
                 width="100"
                 alt="Posting user"
               />
             </div>
             <div className="col p-3">
-              {!displayedUser.equals(currentUser) && (
+              {!userInfo.displayedUser.equals(userInfo.currentUser) && (
                 <p id="returnToLoggedInUser">
                   Return to{" "}
                   <Link
-                    to={`./${currentUser.alias}`}
+                    to={`./${userInfo.currentUser.alias}`}
                     onClick={switchToLoggedInUser}
                   >
                     logged in user
@@ -233,9 +232,9 @@ const UserInfo = () => {
                 </p>
               )}
               <h2>
-                <b>{displayedUser.name}</b>
+                <b>{userInfo.displayedUser.name}</b>
               </h2>
-              <h3>{displayedUser.alias}</h3>
+              <h3>{userInfo.displayedUser.alias}</h3>
               <br />
               {followeeCount > -1 && followerCount > -1 && (
                 <div>
@@ -244,7 +243,7 @@ const UserInfo = () => {
               )}
             </div>
             <form>
-              {!displayedUser.equals(currentUser) && (
+              {!userInfo.displayedUser.equals(userInfo.currentUser) && (
                 <div className="form-group">
                   {isFollower ? (
                     <button
