@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { AuthToken, User } from "tweeter-shared";
+import { User } from "tweeter-shared";
 import { useParams } from "react-router-dom";
 import UserItem from "../userItem/UserItem";
 import { useMessageActions } from "../toaster/MessageHooks";
@@ -26,18 +26,14 @@ const UserItemScroller = (props: Props) => {
         displayErrorMsg: displayErrorMsg
     }
 
-    const presenter = props.presenterFactory(observer);
+    const presenterRef = useRef<UserItemPresenter | null>(null)
+    if (!presenterRef.current) { presenterRef.current = props.presenterFactory(observer); }
 
     useEffect(() => {
-        if (
-            userInfo.authToken &&
-            displayedUserAliasParam &&
-            displayedUserAliasParam != userInfo.displayedUser!.alias
-        ) {
-            getUser(userInfo.authToken!, displayedUserAliasParam!).then((toUser) => {
-            if (toUser) {
-                set(toUser);
-            }
+        if (userInfo.authToken && displayedUserAliasParam && displayedUserAliasParam != userInfo.displayedUser!.alias) {
+            presenterRef.current!.getUser(userInfo.authToken, userInfo.displayedUser!.alias)
+            .then((toUser) => {
+                if (toUser) { set(toUser); }
             });
         }
     }, [displayedUserAliasParam]);
@@ -49,15 +45,11 @@ const UserItemScroller = (props: Props) => {
 
     const reset = async () => {
         setItems(() => []);
-        presenter.reset();
+        presenterRef.current!.reset();
     };
 
     const loadMoreItems = async () => {
-        return presenter.loadMoreItems(userInfo.authToken!, userInfo.displayedUser!.alias);
-    };
-
-    const getUser = async (authToken: AuthToken, alias: string): Promise<User | null> => {
-        return presenter.getUser(authToken, alias);
+        return presenterRef.current!.loadMoreItems(userInfo.authToken!, userInfo.displayedUser!.alias);
     };
 
 
@@ -67,7 +59,7 @@ const UserItemScroller = (props: Props) => {
             className="pr-0 mr-0"
             dataLength={items.length}
             next={() => loadMoreItems()}
-            hasMore={presenter.hasMoreItems}
+            hasMore={presenterRef.current.hasMoreItems}
             loader={<h4>Loading...</h4>}
             >
             {items.map((item, index) => (
