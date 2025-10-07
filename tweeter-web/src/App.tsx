@@ -11,9 +11,12 @@ import Register from "./views/authentication/register/Register";
 import MainLayout from "./views/mainLayout/MainLayout";
 import Toaster from "./views/toaster/Toaster";
 import UserItemScroller from "./views/mainLayout/UserItemScroller";
-import { AuthToken, FakeData, Status, User } from "tweeter-shared";
+import { AuthToken, FakeData, Status } from "tweeter-shared";
 import StatusItemScroller from "./views/mainLayout/StatusItemScroller";
 import { useUserInfo } from "./views/userInfo/UserInfoHooks";
+import FolloweePresenter from "./presenters/FolloweePresenter";
+import { UserItemView } from "./presenters/UserItemPresenter";
+import FollowerPresenter from "./presenters/FollowerPresenter";
 
 const App = () => {
   const userInfo = useUserInfo();
@@ -75,12 +78,11 @@ const AuthenticatedRoutes = () => {
         />
         <Route 
           path="followees/:displayedUser" 
-          element={
-            <UserItemScroller key={`followees-${userInfo.displayedUser!.alias}`} itemDescription={"followees"} featureURL={"/followees"} loadMore={loadMoreFollowees} /> } 
+          element={ <UserItemScroller key={`followees-${userInfo.displayedUser!.alias}`} featureURL={"/followees"} presenterFactory={(view: UserItemView) => new FolloweePresenter(view)} /> } 
         />
         <Route
           path="followers/:displayedUser" 
-          element={<UserItemScroller key={`followers-${userInfo.displayedUser!.alias}`} itemDescription={"followers"} featureURL={"/followers"} loadMore={loadMoreFollowers} /> } 
+          element={<UserItemScroller key={`followers-${userInfo.displayedUser!.alias}`} featureURL={"/followers"} presenterFactory={(view: UserItemView) => new FollowerPresenter(view)} /> }
         />
         <Route path="logout" element={<Navigate to="/login" />} />
         <Route path="*" element={<Navigate to={`/feed/${userInfo.displayedUser!.alias}`} />} />
