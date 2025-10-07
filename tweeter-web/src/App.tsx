@@ -6,14 +6,14 @@ import {
   Routes,
   useLocation,
 } from "react-router-dom";
-import Login from "./components/authentication/login/Login";
-import Register from "./components/authentication/register/Register";
-import MainLayout from "./components/mainLayout/MainLayout";
-import Toaster from "./components/toaster/Toaster";
-import UserItemScroller from "./components/mainLayout/UserItemScroller";
+import Login from "./views/authentication/login/Login";
+import Register from "./views/authentication/register/Register";
+import MainLayout from "./views/mainLayout/MainLayout";
+import Toaster from "./views/toaster/Toaster";
+import UserItemScroller from "./views/mainLayout/UserItemScroller";
 import { AuthToken, FakeData, Status, User } from "tweeter-shared";
-import StatusItemScroller from "./components/mainLayout/StatusItemScroller";
-import { useUserInfo } from "./components/userInfo/UserInfoHooks";
+import StatusItemScroller from "./views/mainLayout/StatusItemScroller";
+import { useUserInfo } from "./views/userInfo/UserInfoHooks";
 
 const App = () => {
   const userInfo = useUserInfo();

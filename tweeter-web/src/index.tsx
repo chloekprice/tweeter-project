@@ -3,8 +3,8 @@ import { createRoot } from "react-dom/client";
 import App from "./App";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { fab } from "@fortawesome/free-brands-svg-icons";
-import UserInfoProvider from "./components/userInfo/UserInfoProvider";
-import ToastInfoProvider from "./components/toaster/ToastInfoProvider";
+import UserInfoProvider from "./views/userInfo/UserInfoProvider";
+import ToastInfoProvider from "./views/toaster/ToastInfoProvider";
 
 library.add(fab);
 
