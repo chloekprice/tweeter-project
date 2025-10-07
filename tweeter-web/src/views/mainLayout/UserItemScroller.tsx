@@ -5,10 +5,7 @@ import { useParams } from "react-router-dom";
 import UserItem from "../userItem/UserItem";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { useUserInfo, useUserInfoActions } from "../userInfo/UserInfoHooks";
-import { FolloweeView } from "../../presenters/FolloweePresenter";
-
-export const PAGE_SIZE = 10;
-
+import FolloweePresenter, { FolloweeView } from "../../presenters/FolloweePresenter";
 
 interface Props {
     itemDescription: String
@@ -25,8 +22,6 @@ interface Props {
 const UserItemScroller = (props: Props) => {
     const { displayErrorMsg } = useMessageActions();
     const [items, setItems] = useState<User[]>([]);
-    const [hasMoreItems, setHasMoreItems] = useState(true);
-    const [lastItem, setLastItem] = useState<User | null>(null);
 
     const addItems = (newItems: User[]) =>
     setItems((previousItems) => [...previousItems, ...newItems]);
@@ -35,10 +30,11 @@ const UserItemScroller = (props: Props) => {
     const { set } = useUserInfoActions();
     const { displayedUser: displayedUserAliasParam } = useParams();
 
-    const view: FolloweeView = {
-        
+    const observer: FolloweeView = {
+
     }
 
+    const presenter = new FolloweePresenter(observer);
 
     // Update the displayed user context variable whenever the displayedUser url parameter changes. This allows browser forward and back buttons to work correctly.
     useEffect(() => {
@@ -67,7 +63,7 @@ const UserItemScroller = (props: Props) => {
     setHasMoreItems(() => true);
     };
 
-    const loadMoreItems = async (lastItem: User | null) => {
+    const loadMoreItems = async () => {
     try {
         const [newItems, hasMore] = await props.loadMore(
         userInfo.authToken!,
@@ -86,12 +82,8 @@ const UserItemScroller = (props: Props) => {
     }
     };
 
-    const getUser = async (
-    authToken: AuthToken,
-    alias: string
-    ): Promise<User | null> => {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.findUserByAlias(alias);
+    const getUser = async (authToken: AuthToken, alias: string): Promise<User | null> => {
+        return presenter.getUser(authToken, alias);
     };
 
 
