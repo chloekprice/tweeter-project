@@ -29,6 +29,11 @@ abstract class StatusItemPresenter {
     public async getUser(authToken: AuthToken, alias: string): Promise<User | null> {
         return this.userService.getUser(authToken, alias);
     };
+
+    public reset() {
+        this.lastItem = null;
+        this.hasMoreItems = true;
+    }
 }
 
 export default StatusItemPresenter;
