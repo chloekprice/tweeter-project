@@ -14,9 +14,9 @@ import UserItemScroller from "./views/mainLayout/UserItemScroller";
 import { AuthToken, FakeData, Status } from "tweeter-shared";
 import StatusItemScroller from "./views/mainLayout/StatusItemScroller";
 import { useUserInfo } from "./views/userInfo/UserInfoHooks";
-import FolloweePresenter from "./presenters/FolloweePresenter";
-import { UserItemView } from "./presenters/UserItemPresenter";
-import FollowerPresenter from "./presenters/FollowerPresenter";
+import FolloweePresenter from "./presenters/UserItem/FolloweePresenter";
+import { UserItemView } from "./presenters/UserItem/UserItemPresenter";
+import FollowerPresenter from "./presenters/UserItem/FollowerPresenter";
 
 const App = () => {
   const userInfo = useUserInfo();

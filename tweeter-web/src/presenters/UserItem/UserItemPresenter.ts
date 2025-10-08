@@ -1,6 +1,6 @@
 import { AuthToken } from "tweeter-shared";
 import { User } from "tweeter-shared/dist/model/domain/User";
-import UserService from "../models/UserService";
+import UserService from "../../models/UserService";
 
 
 export interface UserItemView {
