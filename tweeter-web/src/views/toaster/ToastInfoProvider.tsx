@@ -1,12 +1,11 @@
 import { useCallback, useMemo, useRef, useState } from "react";
-import ToastPresenter, { ToastView } from "../../presenters/ToastPresenter";
 import PropTypes from "prop-types";
 import { ToastListContext, ToastActionsContext } from "./ToastContexts";
 import { Toast, ToastType } from "./Toast";
+import ToastInfoPresenter, { ToastView } from "../../presenters/Toasts/ToastInfoPresenter";
 
 interface Props {
   children: React.ReactNode;
-  presenterFactory: (observer: ToastView) => ToastPresenter
 }
 
 const ToastInfoProvider = (props: Props) => {
@@ -21,8 +20,8 @@ const ToastInfoProvider = (props: Props) => {
     setToastList: setToastList
   }
 
-  const presenterRef = useRef<ToastPresenter | null>(null)
-  if (!presenterRef.current) { presenterRef.current = props.presenterFactory(observer); }
+  const presenterRef = useRef<ToastInfoPresenter | null>(null)
+  if (!presenterRef.current) { presenterRef.current = new ToastInfoPresenter(observer); }
   
 
   const displayToast = useCallback(

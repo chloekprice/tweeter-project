@@ -5,7 +5,7 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { fab } from "@fortawesome/free-brands-svg-icons";
 import UserInfoProvider from "./views/userInfo/UserInfoProvider";
 import ToastInfoProvider from "./views/toaster/ToastInfoProvider";
-import ToastPresenter, { ToastView } from "./presenters/ToastPresenter";
+import ToastPresenter, { ToastView } from "./presenters/Toasts/ToastInfoPresenter";
 
 library.add(fab);
 
@@ -14,7 +14,7 @@ const root = createRoot(container);
 
 root.render(
   <UserInfoProvider>
-    <ToastInfoProvider presenterFactory={(view: ToastView) => new ToastPresenter(view)} >
+    <ToastInfoProvider >
       <App />
     </ToastInfoProvider>
   </UserInfoProvider>

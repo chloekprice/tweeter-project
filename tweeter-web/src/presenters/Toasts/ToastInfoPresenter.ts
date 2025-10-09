@@ -1,4 +1,4 @@
-import { Toast, ToastType } from "../views/toaster/Toast";
+import { Toast, ToastType } from "../../views/toaster/Toast";
 import { v4 as uuid } from "uuid";
 
 
@@ -7,7 +7,7 @@ export interface ToastView {
   setToastList: (toastList: Toast[]) => void
 }
 
-class ToastPresenter {
+class ToastInfoPresenter {
   private _view: ToastView;
 
   public constructor(view: ToastView) {
@@ -41,5 +41,4 @@ class ToastPresenter {
 
 }
 
-export default ToastPresenter;
-
+export default ToastInfoPresenter;

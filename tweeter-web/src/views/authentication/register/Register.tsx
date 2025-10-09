@@ -9,11 +9,7 @@ import { useUserInfoActions } from "../../userInfo/UserInfoHooks";
 import RegisterPresenter, { RegisterView } from "../../../presenters/Authentication/RegisterPresenter";
 
 
-interface Props {
-  presenterFactory: (observer: RegisterView) => RegisterPresenter
-}
-
-const Register = (props: Props) => {
+const Register = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [alias, setAlias] = useState("");
@@ -41,7 +37,7 @@ const Register = (props: Props) => {
   }
 
   const presenterRef = useRef<RegisterPresenter | null>(null)
-  if (!presenterRef.current) { presenterRef.current = props.presenterFactory(observer); }
+  if (!presenterRef.current) { presenterRef.current = new RegisterPresenter(observer); }
 
   const checkSubmitButtonStatus = () => {
         return (

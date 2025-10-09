@@ -12,8 +12,6 @@ interface Props {
 }
 
 const OAuth = (props: Props) => {
-
-
     return (
         <button
             type="button"

@@ -10,7 +10,6 @@ import LoginPresenter, { LoginView } from "../../../presenters/Authentication/Lo
 
 interface Props {
   originalUrl?: string
-  presenterFactory: (observer: LoginView) => LoginPresenter
 }
 
 const Login = (props: Props) => {
@@ -33,7 +32,7 @@ const Login = (props: Props) => {
   }
 
   const presenterRef = useRef<LoginPresenter | null>(null)
-  if (!presenterRef.current) { presenterRef.current = props.presenterFactory(observer); }
+  if (!presenterRef.current) { presenterRef.current = new LoginPresenter(observer); }
 
   const checkSubmitButtonStatus = () =>  {
       return !alias || !password;
