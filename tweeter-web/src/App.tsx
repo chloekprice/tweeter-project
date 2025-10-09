@@ -60,14 +60,17 @@ const AuthenticatedRoutes = () => {
         />
         <Route 
           path="followees/:displayedUser" 
-          element={ <UserItemScroller key={`followees-${userInfo.displayedUser!.alias}`} featureURL={"/followees"} presenterFactory={(view: UserItemView) => new FolloweePresenter(view)} /> } 
+          element={ <UserItemScroller key={`/followees/${userInfo.displayedUser!.alias}`} featureURL={"/followees"} presenterFactory={(view: UserItemView) => new FolloweePresenter(view)} /> } 
         />
         <Route
           path="followers/:displayedUser" 
-          element={<UserItemScroller key={`followers-${userInfo.displayedUser!.alias}`} featureURL={"/followers"} presenterFactory={(view: UserItemView) => new FollowerPresenter(view)} /> }
+          element={<UserItemScroller key={`/followers/${userInfo.displayedUser!.alias}`} featureURL={"/followers"} presenterFactory={(view: UserItemView) => new FollowerPresenter(view)} /> }
         />
         <Route path="logout" element={<Navigate to="/login" />} />
-        <Route path="*" element={<Navigate to={`/feed/${userInfo.displayedUser!.alias}`} />} />
+        <Route 
+          path="*" 
+          element={<Navigate to={`/feed/${userInfo.displayedUser!.alias}`} />} 
+        />
       </Route>
     </Routes>
   );
