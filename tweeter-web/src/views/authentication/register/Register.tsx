@@ -1,133 +1,49 @@
 import "./Register.css";
 import "bootstrap/dist/css/bootstrap.css";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthenticationFormLayout from "../AuthenticationFormLayout";
-import { AuthToken, FakeData, User } from "tweeter-shared";
-import { Buffer } from "buffer";
 import AuthenticationFields from "../AuthenticationFields";
 import { useMessageActions } from "../../toaster/MessageHooks";
 import { useUserInfoActions } from "../../userInfo/UserInfoHooks";
+import RegisterPresenter from "../../../presenters/Authentication/RegisterPresenter";
+import { AuthenticationView } from "../../../presenters/Authentication/AuthenticationPresenter";
 
-const Register = () => {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [alias, setAlias] = useState("");
-  const [password, setPassword] = useState("");
-  const [imageBytes, setImageBytes] = useState<Uint8Array>(new Uint8Array());
-  const [imageUrl, setImageUrl] = useState<string>("");
-  const [imageFileExtension, setImageFileExtension] = useState<string>("");
-  const [rememberMe, setRememberMe] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
+interface Props {
+  presenterFactory: (observer: AuthenticationView) => RegisterPresenter
+}
+
+const Register = (props: Props) => {
   const navigate = useNavigate();
   const { update } = useUserInfoActions();
   const { displayErrorMsg } = useMessageActions();
 
-  const checkSubmitButtonStatus = (): boolean => {
-    return (
-      !firstName ||
-      !lastName ||
-      !alias ||
-      !password ||
-      !imageUrl ||
-      !imageFileExtension
-    );
-  };
+  const observer: AuthenticationView = {
+      displayErrorMsg: displayErrorMsg,
+      update: update
+  }
+
+  const presenterRef = useRef<RegisterPresenter | null>(null)
+  if (!presenterRef.current) { presenterRef.current = props.presenterFactory(observer); }
 
   const registerOnEnter = (event: React.KeyboardEvent<HTMLElement>) => {
-    if (event.key == "Enter" && !checkSubmitButtonStatus()) {
+    if (event.key == "Enter" && !presenterRef.current!.checkSubmitButtonStatus()) {
       doRegister();
     }
   };
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    handleImageFile(file);
-  };
-
-  const handleImageFile = (file: File | undefined) => {
-    if (file) {
-      setImageUrl(URL.createObjectURL(file));
-
-      const reader = new FileReader();
-      reader.onload = (event: ProgressEvent<FileReader>) => {
-        const imageStringBase64 = event.target?.result as string;
-
-        // Remove unnecessary file metadata from the start of the string.
-        const imageStringBase64BufferContents =
-          imageStringBase64.split("base64,")[1];
-
-        const bytes: Uint8Array = Buffer.from(
-          imageStringBase64BufferContents,
-          "base64"
-        );
-
-        setImageBytes(bytes);
-      };
-      reader.readAsDataURL(file);
-
-      // Set image file extension (and move to a separate method)
-      const fileExtension = getFileExtension(file);
-      if (fileExtension) {
-        setImageFileExtension(fileExtension);
-      }
-    } else {
-      setImageUrl("");
-      setImageBytes(new Uint8Array());
-    }
-  };
-
-  const getFileExtension = (file: File): string | undefined => {
-    return file.name.split(".").pop();
+    presenterRef.current!.handleImageFile(file);
   };
 
   const doRegister = async () => {
-    try {
-      setIsLoading(true);
-
-      const [user, authToken] = await register(
-        firstName,
-        lastName,
-        alias,
-        password,
-        imageBytes,
-        imageFileExtension
-      );
-
-      update(user, user, authToken, rememberMe);
-      navigate(`/feed/${user.alias}`);
-    } catch (error) {
-      displayErrorMsg(
-        `Failed to register user because of exception: ${error}`,
-      );
-    } finally {
-      setIsLoading(false);
-    }
+      presenterRef.current!.doRegister();
+      navigate(`/feed/${presenterRef.current!.alias}`);
   };
 
-  const register = async (
-    firstName: string,
-    lastName: string,
-    alias: string,
-    password: string,
-    userImageBytes: Uint8Array,
-    imageFileExtension: string
-  ): Promise<[User, AuthToken]> => {
-    // Not neded now, but will be needed when you make the request to the server in milestone 3
-    const imageStringBase64: string =
-      Buffer.from(userImageBytes).toString("base64");
-
-    // TODO: Replace with the result of calling the server
-    const user = FakeData.instance.firstUser;
-
-    if (user === null) {
-      throw new Error("Invalid registration");
-    }
-
-    return [user, FakeData.instance.authToken];
-  };
-
+  
   const inputFieldFactory = () => {
     return (
       <>
@@ -139,7 +55,7 @@ const Register = () => {
             id="firstNameInput"
             placeholder="First Name"
             onKeyDown={registerOnEnter}
-            onChange={(event) => setFirstName(event.target.value)}
+            onChange={(event) => presenterRef.current!.setFirstName(event.target.value)}
           />
           <label htmlFor="firstNameInput">First Name</label>
         </div>
@@ -151,11 +67,11 @@ const Register = () => {
             id="lastNameInput"
             placeholder="Last Name"
             onKeyDown={registerOnEnter}
-            onChange={(event) => setLastName(event.target.value)}
+            onChange={(event) => presenterRef.current!.setLastName(event.target.value)}
           />
           <label htmlFor="lastNameInput">Last Name</label>
         </div>
-        <AuthenticationFields onEnter={registerOnEnter} alias={alias} setAlias={setAlias} password={password} setPassword={setPassword} />
+        <AuthenticationFields onEnter={registerOnEnter} alias={presenterRef.current!.alias} setAlias={presenterRef.current!.setAlias} password={presenterRef.current!.password} setPassword={presenterRef.current!.setPassword} />
         <div className="form-floating mb-3">
           <input
             type="file"
@@ -164,10 +80,10 @@ const Register = () => {
             onKeyDown={registerOnEnter}
             onChange={handleFileChange}
           />
-          {imageUrl.length > 0 && (
+          {presenterRef.current!.imageUrl.length > 0 && (
             <>
               <label htmlFor="imageFileInput">User Image</label>
-              <img src={imageUrl} className="img-thumbnail" alt=""></img>
+              <img src={presenterRef.current!.imageUrl} className="img-thumbnail" alt=""></img>
             </>
           )}
         </div>
@@ -190,9 +106,9 @@ const Register = () => {
       oAuthHeading="Register with:"
       inputFieldFactory={inputFieldFactory}
       switchAuthenticationMethodFactory={switchAuthenticationMethodFactory}
-      setRememberMe={setRememberMe}
-      submitButtonDisabled={checkSubmitButtonStatus}
-      isLoading={isLoading}
+      setRememberMe={presenterRef.current!.setRememberMe}
+      submitButtonDisabled={presenterRef.current!.checkSubmitButtonStatus}
+      isLoading={presenterRef.current!.isLoading}
       submit={doRegister}
     />
   );
