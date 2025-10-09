@@ -79,9 +79,9 @@ const UnauthenticatedRoutes = () => {
 
   return (
     <Routes>
-      <Route path="/login" element={<Login presenterFactory={(observer: AuthenticationView) => new LoginPresenter(observer)} />} />
-      <Route path="/register" element={<Register presenterFactory={(observer: AuthenticationView) => new RegisterPresenter(observer)} />} />
-      <Route path="*" element={<Login originalUrl={location.pathname} presenterFactory={(observer: AuthenticationView) => new LoginPresenter(observer)} />} />
+      <Route path="/login" element={<Login presenterFactory={(view: AuthenticationView) => new LoginPresenter(view)} />} />
+      <Route path="/register" element={<Register presenterFactory={(view: AuthenticationView) => new RegisterPresenter(view)} />} />
+      <Route path="*" element={<Login originalUrl={location.pathname} presenterFactory={(view: AuthenticationView) => new LoginPresenter(view)} />} />
     </Routes>
   );
 };
