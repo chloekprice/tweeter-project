@@ -19,9 +19,8 @@ import FollowerPresenter from "./presenters/UserItem/FollowerPresenter";
 import FeedPresenter from "./presenters/StatusItem/FeedPresenter";
 import { StatusItemView } from "./presenters/StatusItem/StatusItemPresenter";
 import StoryPresenter from "./presenters/StatusItem/StoryPresenter";
-import LoginPresenter from "./presenters/Authentication/LoginPresenter";
-import { AuthenticationView } from "./presenters/Authentication/AuthenticationPresenter";
-import RegisterPresenter from "./presenters/Authentication/RegisterPresenter";
+import LoginPresenter, { LoginView } from "./presenters/Authentication/LoginPresenter";
+import RegisterPresenter, { RegisterView } from "./presenters/Authentication/RegisterPresenter";
 
 const App = () => {
   const userInfo = useUserInfo();
@@ -79,9 +78,9 @@ const UnauthenticatedRoutes = () => {
 
   return (
     <Routes>
-      <Route path="/login" element={<Login presenterFactory={(view: AuthenticationView) => new LoginPresenter(view)} />} />
-      <Route path="/register" element={<Register presenterFactory={(view: AuthenticationView) => new RegisterPresenter(view)} />} />
-      <Route path="*" element={<Login originalUrl={location.pathname} presenterFactory={(view: AuthenticationView) => new LoginPresenter(view)} />} />
+      <Route path="/login" element={<Login presenterFactory={(view: LoginView) => new LoginPresenter(view)} />} />
+      <Route path="/register" element={<Register presenterFactory={(view: RegisterView) => new RegisterPresenter(view)} />} />
+      <Route path="*" element={<Login originalUrl={location.pathname} presenterFactory={(view: LoginView) => new LoginPresenter(view)} />} />
     </Routes>
   );
 };

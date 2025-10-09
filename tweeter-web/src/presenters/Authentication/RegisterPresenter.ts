@@ -1,66 +1,46 @@
 import { Buffer } from "buffer";
-import AuthenticationPresenter, { AuthenticationView } from "./AuthenticationPresenter";
+import { User, AuthToken } from "tweeter-shared";
+import AuthenticationService from "../../models/AuthenticationService";
 
-class RegisterPresenter extends AuthenticationPresenter {
-    private _firstName: string = "";
-    private _lastName: string = "";
-    private _alias: string = "";
-    private _password: string = "";
-    private _imageBytes: Uint8Array = new Uint8Array()
-    private _imageUrl: string = "";
-    private _imageFileExtension: string = "";
-    private _rememberMe: boolean = false;
+export interface RegisterView {
+    displayErrorMsg: (message: string, bootstrapClasses?: string | undefined) => string
+    setAlias: (alias: string) => void
+    setPassword: (password: string) => void
+    setRememberMe: (rememberMe: boolean) => void
+    setIsLoading: (isLoading: boolean) => void
+    setImageUrl: (imageUrl: string) => void
+    setImageBytes: (imageBytes: Uint8Array) => void
+    setImageFileExtension: (imageFileExtension: string) => void
+    update: (currentUser: User, displayedUser: User | null, authToken: AuthToken, remember: boolean) => void 
+}
 
-    public constructor(view: AuthenticationView) {
-        super(view);
+class RegisterPresenter {
+    protected authService: AuthenticationService;
+    private _view: RegisterView;
+
+    public constructor(view: RegisterView) {
+        this.authService = new AuthenticationService();
+        this._view = view;
     }
 
-    public get firstName(): string { return this._firstName; }
-    public get lastName(): string { return this._lastName; }
-    public get alias(): string { return this._alias; }
-    public get password(): string { return this._password; }
-    public get imageBytes(): Uint8Array { return this._imageBytes; }
-    public get imageUrl(): string { return this._imageUrl; }
-    public get imageFileExtension(): string { return this._imageFileExtension; }
-    public get rememberMe(): boolean { return this._rememberMe; }
+    public get view(): RegisterView { return this._view; };
 
-    public setFirstName(newValue: string) { this._firstName = newValue; }
-    public setLastName(newValue: string) { this._lastName = newValue }
-    public setAlias(newValue: string) { this._alias = newValue; }
-    public setPassword(newValue: string) { this._password = newValue }
-    public set imageBytes(newValue) { this._imageBytes = newValue; }
-    public set imageUrl(newValue) { this._imageUrl = newValue; }
-    public set imageFileExtension(newValue) { this._imageFileExtension = newValue; }
-    public setRememberMe(newValue: boolean) { this._rememberMe = newValue; }
-    
-
-    public checkSubmitButtonStatus(): boolean {
-        return (
-            !this.firstName ||
-            !this.lastName ||
-            !this.alias ||
-            !this.password ||
-            !this.imageUrl ||
-            !this.imageFileExtension
-        );
-    };
-
-    public async doRegister() {
+    public async doRegister(firstName: string, lastName: string, alias: string, password: string, imageBytes: Uint8Array, imageFileExtension: string, rememberMe: boolean) {
         try {
-            this.isLoading = true;
+            this.view.setIsLoading(true);
             const [user, authToken] = await this.authService.register(
-                this.firstName,
-                this.lastName,
-                this.alias,
-                this.password,
-                this.imageBytes,
-                this.imageFileExtension
+                firstName,
+                lastName,
+                alias,
+                password,
+                imageBytes,
+                imageFileExtension
             );
-            this.view.update(user, user, authToken, this.rememberMe);
+            this.view.update(user, user, authToken, rememberMe);
         } catch (error) {
             this.view.displayErrorMsg(`Failed to register user because of exception: ${error}`);
         } finally {
-            this.isLoading = false;
+            this.view.setIsLoading(false);
         }
     }
 
@@ -70,7 +50,7 @@ class RegisterPresenter extends AuthenticationPresenter {
 
     public handleImageFile(file: File | undefined) {
         if (file) {
-          this.imageUrl = URL.createObjectURL(file);
+          this.view.setImageUrl(URL.createObjectURL(file));
     
           const reader = new FileReader();
           reader.onload = (event: ProgressEvent<FileReader>) => {
@@ -85,18 +65,18 @@ class RegisterPresenter extends AuthenticationPresenter {
               "base64"
             );
     
-            this.imageBytes = bytes;
+            this.view.setImageBytes(bytes);
           };
           reader.readAsDataURL(file);
     
           // Set image file extension (and move to a separate method)
           const fileExtension = this.getFileExtension(file);
           if (fileExtension) {
-            this.imageFileExtension = fileExtension;
+            this.view.setImageFileExtension(fileExtension);
           }
         } else {
-            this.imageUrl = "";
-            this.imageBytes = new Uint8Array();
+            this.view.setImageUrl("");
+            this.view.setImageBytes(new Uint8Array());
         }
     }
 }

@@ -1,24 +1,35 @@
-import AuthenticationPresenter, { AuthenticationView } from "./AuthenticationPresenter";
+import { User, AuthToken } from "tweeter-shared";
+import AuthenticationService from "../../models/AuthenticationService";
 
-class LoginPresenter extends AuthenticationPresenter {
+export interface LoginView {
+    displayErrorMsg: (message: string, bootstrapClasses?: string | undefined) => string
+    setAlias: (alias: string) => void
+    setPassword: (password: string) => void
+    setRememberMe: (rememberMe: boolean) => void
+    setIsLoading: (isLoading: boolean) => void
+    update: (currentUser: User, displayedUser: User | null, authToken: AuthToken, remember: boolean) => void 
+}
 
-    public constructor(view: AuthenticationView) {
-        super(view);
+class LoginPresenter {
+    protected authService: AuthenticationService;
+    private _view: LoginView;
+
+    public constructor(view: LoginView) {
+        this.authService = new AuthenticationService();
+        this._view = view;
     }
 
-    checkSubmitButtonStatus(alias: string, password: string): boolean {
-        return !alias || !password;
-    }
+    public get view(): LoginView { return this._view; };
 
     public async doLogin(alias: string, password: string, rememberMe: boolean): Promise<void> {
         try {
-            this.isLoading = true;
+            this.view.setIsLoading(true);
             const [user, authToken] = await this.authService.login(alias, password);
             this.view.update(user, user, authToken, rememberMe);
         } catch (error) {
             this.view.displayErrorMsg(`Failed to log user in because of exception: ${error}`);
         } finally {
-            this.isLoading = false;
+            this.view.setIsLoading(false);
         }
     }
 }

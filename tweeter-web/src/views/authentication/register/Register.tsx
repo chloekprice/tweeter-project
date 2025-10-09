@@ -1,34 +1,61 @@
 import "./Register.css";
 import "bootstrap/dist/css/bootstrap.css";
-import { ChangeEvent, useRef } from "react";
+import { ChangeEvent, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthenticationFormLayout from "../AuthenticationFormLayout";
 import AuthenticationFields from "../AuthenticationFields";
 import { useMessageActions } from "../../toaster/MessageHooks";
 import { useUserInfoActions } from "../../userInfo/UserInfoHooks";
-import RegisterPresenter from "../../../presenters/Authentication/RegisterPresenter";
-import { AuthenticationView } from "../../../presenters/Authentication/AuthenticationPresenter";
+import RegisterPresenter, { RegisterView } from "../../../presenters/Authentication/RegisterPresenter";
 
 
 interface Props {
-  presenterFactory: (observer: AuthenticationView) => RegisterPresenter
+  presenterFactory: (observer: RegisterView) => RegisterPresenter
 }
 
 const Register = (props: Props) => {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [alias, setAlias] = useState("");
+  const [password, setPassword] = useState("");
+  const [imageBytes, setImageBytes] = useState<Uint8Array>(new Uint8Array());
+  const [imageUrl, setImageUrl] = useState<string>("");
+  const [imageFileExtension, setImageFileExtension] = useState<string>("");
+  const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  
   const navigate = useNavigate();
   const { update } = useUserInfoActions();
   const { displayErrorMsg } = useMessageActions();
 
-  const observer: AuthenticationView = {
-      displayErrorMsg: displayErrorMsg,
-      update: update
+  const observer: RegisterView = {
+    displayErrorMsg: displayErrorMsg,
+    setAlias: (alias: string) => setAlias(alias),
+    setPassword: (password: string) => setPassword(password),
+    setRememberMe: (rememberMe: boolean) => setRememberMe(rememberMe),
+    setIsLoading: (isLoading: boolean) => setIsLoading(isLoading),
+    update: update,
+    setImageUrl: (imageUrl: string) => setImageUrl(imageUrl),
+    setImageBytes: (imageBytes: Uint8Array) => setImageBytes(imageBytes),
+    setImageFileExtension: (imageFileExtension: string) => setImageFileExtension(imageFileExtension)
   }
 
   const presenterRef = useRef<RegisterPresenter | null>(null)
   if (!presenterRef.current) { presenterRef.current = props.presenterFactory(observer); }
 
+  const checkSubmitButtonStatus = () => {
+        return (
+            !firstName ||
+            !lastName ||
+            !alias ||
+            !password ||
+            !imageUrl ||
+            !imageFileExtension
+        );
+  };
+
   const registerOnEnter = (event: React.KeyboardEvent<HTMLElement>) => {
-    if (event.key == "Enter" && !presenterRef.current!.checkSubmitButtonStatus()) {
+    if (event.key == "Enter" && !checkSubmitButtonStatus()) {
       doRegister();
     }
   };
@@ -39,8 +66,8 @@ const Register = (props: Props) => {
   };
 
   const doRegister = async () => {
-      presenterRef.current!.doRegister();
-      navigate(`/feed/${presenterRef.current!.alias}`);
+      presenterRef.current!.doRegister(firstName, lastName, alias, password, imageBytes, imageFileExtension, rememberMe);
+      navigate(`/feed/${alias}`);
   };
 
   
@@ -55,7 +82,7 @@ const Register = (props: Props) => {
             id="firstNameInput"
             placeholder="First Name"
             onKeyDown={registerOnEnter}
-            onChange={(event) => presenterRef.current!.setFirstName(event.target.value)}
+            onChange={(event) => setFirstName(event.target.value)}
           />
           <label htmlFor="firstNameInput">First Name</label>
         </div>
@@ -67,11 +94,11 @@ const Register = (props: Props) => {
             id="lastNameInput"
             placeholder="Last Name"
             onKeyDown={registerOnEnter}
-            onChange={(event) => presenterRef.current!.setLastName(event.target.value)}
+            onChange={(event) => setLastName(event.target.value)}
           />
           <label htmlFor="lastNameInput">Last Name</label>
         </div>
-        <AuthenticationFields onEnter={registerOnEnter} alias={presenterRef.current!.alias} setAlias={presenterRef.current!.setAlias} password={presenterRef.current!.password} setPassword={presenterRef.current!.setPassword} />
+        <AuthenticationFields onEnter={registerOnEnter} alias={alias} setAlias={setAlias} password={password} setPassword={setPassword} />
         <div className="form-floating mb-3">
           <input
             type="file"
@@ -80,10 +107,10 @@ const Register = (props: Props) => {
             onKeyDown={registerOnEnter}
             onChange={handleFileChange}
           />
-          {presenterRef.current!.imageUrl.length > 0 && (
+          {imageUrl.length > 0 && (
             <>
               <label htmlFor="imageFileInput">User Image</label>
-              <img src={presenterRef.current!.imageUrl} className="img-thumbnail" alt=""></img>
+              <img src={imageUrl} className="img-thumbnail" alt=""></img>
             </>
           )}
         </div>
@@ -106,9 +133,9 @@ const Register = (props: Props) => {
       oAuthHeading="Register with:"
       inputFieldFactory={inputFieldFactory}
       switchAuthenticationMethodFactory={switchAuthenticationMethodFactory}
-      setRememberMe={presenterRef.current!.setRememberMe}
-      submitButtonDisabled={presenterRef.current!.checkSubmitButtonStatus}
-      isLoading={presenterRef.current!.isLoading}
+      setRememberMe={setRememberMe}
+      submitButtonDisabled={checkSubmitButtonStatus}
+      isLoading={isLoading}
       submit={doRegister}
     />
   );
