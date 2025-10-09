@@ -1,4 +1,3 @@
-import { User, AuthToken } from "tweeter-shared";
 import AuthenticationService from "../../models/AuthenticationService";
 
 export interface AuthenticationView {
