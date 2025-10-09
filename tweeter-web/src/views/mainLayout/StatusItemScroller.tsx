@@ -31,7 +31,7 @@ const StatusItemScroller = (props: Props) => {
 
     useEffect(() => {
         if (userInfo.authToken && displayedUserAliasParam && displayedUserAliasParam != userInfo.displayedUser!.alias) {
-            presenterRef.current!.getUser(userInfo.authToken, userInfo.displayedUser!.alias)
+            presenterRef.current!.getUser(userInfo.authToken, displayedUserAliasParam!)
             .then((toUser) => {
                 if (toUser) { set(toUser); }
             });
