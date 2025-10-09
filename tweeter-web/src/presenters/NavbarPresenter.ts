@@ -8,11 +8,11 @@ export interface NavbarView {
 }
 
 class NavbarPresenter {
-    private authenticationService: AuthenticationService;
+    private authService: AuthenticationService;
     private _view: NavbarView;
 
     public constructor(view: NavbarView) { 
-        this.authenticationService = new AuthenticationService();
+        this.authService = new AuthenticationService();
         this._view = view;
     }
 
@@ -22,7 +22,7 @@ class NavbarPresenter {
         const loggingOutToastId = this.view.displayInfoMsg("Logging Out...", 0);
 
         try {
-            await this.authenticationService.logUserOut(authToken);
+            await this.authService.logUserOut(authToken);
             this.view.deleteMsg(loggingOutToastId);
         } catch (error) {
            this.view.displayErrorMsg(`Failed to log user out because of exception: ${error}`);
