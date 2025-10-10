@@ -1,5 +1,5 @@
 import { AuthToken } from "tweeter-shared/dist/model/domain/AuthToken";
-import AuthenticationService from "../models/AuthenticationService";
+import AuthenticationService from "../../models/AuthenticationService";
 
 export interface NavbarView {
     deleteMsg: (_toast: string) => void

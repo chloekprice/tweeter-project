@@ -5,7 +5,7 @@ import Image from "react-bootstrap/Image";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { useUserInfo, useUserInfoActions } from "../userInfo/UserInfoHooks";
 import { useRef } from "react";
-import NavbarPresenter, { NavbarView } from "../../presenters/NavbarPresenter";
+import NavbarPresenter, { NavbarView } from "../../presenters/Navigation/NavbarPresenter";
 
 const AppNavbar = () => {
   const location = useLocation();
