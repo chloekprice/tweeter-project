@@ -4,7 +4,6 @@ import UserService from "../../models/UserService";
 
 export interface NavigateView {
     displayErrorMsg: (message: string, bootstrapClasses?: string | undefined) => string
-    setUser: (user: User) => void
 }
 
 class NavigatePresenter {
@@ -18,22 +17,15 @@ class NavigatePresenter {
 
     public get view(): NavigateView { return this._view; }
 
-    public async navigateToUser(authToken: AuthToken, target: string, displayedUser: User): Promise<string> {
+    public async getUser(authToken: AuthToken, target: string): Promise<User | null> {
         try {
             const alias = this.extractAlias(target);
             const toUser = await this.userService.getUser(authToken, alias);
-
-            if (toUser) {
-                if (!toUser.equals(displayedUser)) {
-                    this.view.setUser(toUser);
-                    return toUser.alias;
-                }
-            }
-
+            return toUser;
         } catch (error) {
             this.view.displayErrorMsg(`Failed to get user because of exception: ${error}`);
         } finally {
-            return "";
+            return null;
         }
     }
     
