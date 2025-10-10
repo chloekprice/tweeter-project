@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import { AuthToken, User, FakeData } from "tweeter-shared";
 import { useUserInfo, useUserInfoActions } from "../userInfo/UserInfoHooks";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { useCallback, useRef } from "react";
