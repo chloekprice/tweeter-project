@@ -1,8 +1,9 @@
 import "./PostStatus.css";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { AuthToken, Status } from "tweeter-shared";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { useUserInfo } from "../userInfo/UserInfoHooks";
+import PostPresenter, { PostView } from "../../presenters/PostPresenter";
 
 const PostStatus = () => {
   const { displayInfoMsg, displayErrorMsg, deleteMsg } = useMessageActions();
@@ -11,42 +12,19 @@ const PostStatus = () => {
   const [post, setPost] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const observer: PostView = {
+    deleteMsg: deleteMsg,
+    displayErrorMsg: displayErrorMsg,
+    displayInfoMsg: displayInfoMsg,         
+    setIsLoading: setIsLoading,
+    setPost: setPost
+  }
+
+  const presenterRef = useRef<PostPresenter | null>(null)
+  if (!presenterRef.current) { presenterRef.current = new PostPresenter(observer); }
+
   const submitPost = async (event: React.MouseEvent) => {
-    event.preventDefault();
-
-    var postingStatusToastId = "";
-
-    try {
-      setIsLoading(true);
-      postingStatusToastId = displayInfoMsg(
-        "Posting status...",
-        0
-      );
-
-      const status = new Status(post, userInfo.currentUser!, Date.now());
-
-      await postStatus(userInfo.authToken!, status);
-
-      setPost("");
-      displayInfoMsg("Status posted!", 2000);
-    } catch (error) {
-      displayErrorMsg(
-        `Failed to post the status because of exception: ${error}`,
-      );
-    } finally {
-      deleteMsg(postingStatusToastId);
-      setIsLoading(false);
-    }
-  };
-
-  const postStatus = async (
-    authToken: AuthToken,
-    newStatus: Status
-  ): Promise<void> => {
-    // Pause so we can see the logging out message. Remove when connected to the server
-    await new Promise((f) => setTimeout(f, 2000));
-
-    // TODO: Call the server to post the status
+    await presenterRef.current!.submitPost(post, userInfo.currentUser!, userInfo.authToken!);
   };
 
   const clearPost = (event: React.MouseEvent) => {

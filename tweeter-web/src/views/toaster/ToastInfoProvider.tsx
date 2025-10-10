@@ -1,18 +1,28 @@
-import { useCallback, useMemo, useState } from "react";
-import { Toast, ToastType, makeToast } from "./Toast";
+import { useCallback, useMemo, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import { ToastListContext, ToastActionsContext } from "./ToastContexts";
+import { Toast, ToastType } from "./Toast";
+import ToastInfoPresenter, { ToastView } from "../../presenters/Toasts/ToastInfoPresenter";
 
 interface Props {
   children: React.ReactNode;
 }
 
-const ToastInfoProvider: React.FC<Props> = ({ children }) => {
+const ToastInfoProvider = (props: Props) => {
   const [toastList, setToastList] = useState<Toast[]>([]);
 
   const displayExistingToast = useCallback((toast: Toast) => {
     setToastList((previousList) => [...previousList, toast]);
   }, []);
+
+  const observer: ToastView = {
+    displayExistingToast: displayExistingToast,
+    setToastList: setToastList
+  }
+
+  const presenterRef = useRef<ToastInfoPresenter | null>(null)
+  if (!presenterRef.current) { presenterRef.current = new ToastInfoPresenter(observer); }
+  
 
   const displayToast = useCallback(
     (
@@ -22,28 +32,17 @@ const ToastInfoProvider: React.FC<Props> = ({ children }) => {
       title?: string,
       bootstrapClasses?: string
     ): string => {
-      const toast = makeToast(
-        toastType,
-        message,
-        duration,
-        title,
-        bootstrapClasses
-      );
-      displayExistingToast(toast);
-      return toast.id;
+      return presenterRef.current!.displayToast(toastType, message, duration, title, bootstrapClasses);
     },
     [displayExistingToast]
   );
 
   const deleteToast = useCallback((id: string) => {
-    setToastList((currentList) => {
-      const filtered = currentList.filter((x) => x.id !== id);
-      return filtered;
-    });
+    presenterRef.current!.deleteToast(id, toastList);
   }, []);
 
   const deleteAllToasts = useCallback(() => {
-    setToastList([]);
+    presenterRef.current!.deleteAllToasts();
   }, []);
 
   const toastActions = useMemo(
@@ -59,7 +58,7 @@ const ToastInfoProvider: React.FC<Props> = ({ children }) => {
   return (
     <ToastListContext.Provider value={toastList}>
       <ToastActionsContext.Provider value={toastActions}>
-        {children}
+        {props.children}
       </ToastActionsContext.Provider>
     </ToastListContext.Provider>
   );

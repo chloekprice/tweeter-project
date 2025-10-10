@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import UserItem from "../userItem/UserItem";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { useUserInfo, useUserInfoActions } from "../userInfo/UserInfoHooks";
-import UserItemPresenter, { UserItemView } from "../../presenters/UserItemPresenter";
+import UserItemPresenter, { UserItemView } from "../../presenters/UserItem/UserItemPresenter";
 
 interface Props {
     featureURL: string
@@ -31,10 +31,10 @@ const UserItemScroller = (props: Props) => {
 
     useEffect(() => {
         if (userInfo.authToken && displayedUserAliasParam && displayedUserAliasParam != userInfo.displayedUser!.alias) {
-            presenterRef.current!.getUser(userInfo.authToken, userInfo.displayedUser!.alias)
-            .then((toUser) => {
-                if (toUser) { set(toUser); }
-            });
+            presenterRef.current!.getUser(userInfo.authToken, displayedUserAliasParam!)
+                .then((toUser) => {
+                    if (toUser) { set(toUser); }
+                });
         }
     }, [displayedUserAliasParam]);
 
@@ -56,20 +56,20 @@ const UserItemScroller = (props: Props) => {
     return (
         <div className="container px-0 overflow-visible vh-100">
             <InfiniteScroll
-            className="pr-0 mr-0"
-            dataLength={items.length}
-            next={() => loadMoreItems()}
-            hasMore={presenterRef.current.hasMoreItems}
-            loader={<h4>Loading...</h4>}
+                className="pr-0 mr-0"
+                dataLength={items.length}
+                next={() => loadMoreItems()}
+                hasMore={presenterRef.current.hasMoreItems}
+                loader={<h4>Loading...</h4>}
             >
-            {items.map((item, index) => (
-                <div
-                key={index}
-                className="row mb-3 mx-0 px-0 border rounded bg-white"
-                >
-                <UserItem user={item} featurePath={props.featureURL} />
-                </div>
-            ))}
+                {items.map((item, index) => (
+                    <div
+                    key={index}
+                    className="row mb-3 mx-0 px-0 border rounded bg-white"
+                    >
+                    <UserItem user={item} featurePath={props.featureURL} />
+                    </div>
+                ))}
             </InfiniteScroll>
         </div>
     );

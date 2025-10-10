@@ -14,7 +14,6 @@ interface Props {
 const StatusItem = (props: Props) => {
     const { navigateToUser } = useNavigateToUser();
 
-
     return (
         <div
             key={props.index}

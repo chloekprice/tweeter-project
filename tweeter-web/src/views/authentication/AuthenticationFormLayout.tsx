@@ -17,11 +17,7 @@ const AuthenticationFormLayout = (props: Props) => {
   const { displayInfoMsg } = useMessageActions();
 
   const displayInfoMessageWithDarkBackground = (message: string): void => {
-    displayInfoMsg(
-      message,
-      3000,
-      "text-white bg-primary"
-    );
+    displayInfoMsg(message, 3000, "text-white bg-primary");
   };
 
   return (
