@@ -22,7 +22,6 @@ class StoryPresenter extends StatusItemPresenter {
             this.view.displayErrorMsg(`Failed to load story items because of exception: ${error}`);
         }
     }
-
 }
 
 export default StoryPresenter;

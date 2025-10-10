@@ -46,7 +46,7 @@ class UserService {
         const followeeCount = await this.getFolloweeCount(authToken, userToUnfollow);
     
         return [followerCount, followeeCount];
-      };
+    };
     
 }
 

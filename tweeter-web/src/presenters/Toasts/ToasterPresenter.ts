@@ -23,8 +23,6 @@ class ToasterPresenter {
             }
       }
     };
-  
-
 }
 
 export default ToasterPresenter;

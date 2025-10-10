@@ -22,7 +22,6 @@ class FeedPresenter extends StatusItemPresenter {
             this.view.displayErrorMsg(`Failed to load feed items because of exception: ${error}`);
         }
     }
-
 }
 
 export default FeedPresenter;

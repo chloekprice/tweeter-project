@@ -3,7 +3,7 @@ import { AuthToken, User, FakeData } from "tweeter-shared";
 import { useUserInfo, useUserInfoActions } from "../userInfo/UserInfoHooks";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { useCallback, useRef } from "react";
-import NavigatePresenter, { NavigateView } from "../../presenters/NavigatePresenter";
+import NavigatePresenter, { NavigateView } from "../../presenters/Navigation/NavigatePresenter";
 
 interface NavigateToUserData {
     featurePath: String

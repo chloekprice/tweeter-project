@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { User, AuthToken } from "tweeter-shared";
 import { UserInfoContext, UserInfoActionsContext } from "./UserInfoContexts";
-import UserDataPresenter from "../../presenters/UserDataPresenter";
+import UserDataPresenter from "../../presenters/UserDetails/UserDataPresenter";
 
 interface Props {
   children: React.ReactNode;

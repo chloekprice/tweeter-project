@@ -1,13 +1,12 @@
 import { AuthToken, User } from "tweeter-shared";
-import { UserInfo } from "../views/userInfo/UserInfo";
+import { UserInfo } from "../../views/userInfo/UserInfo";
 
 const CURRENT_USER_KEY: string = "CurrentUserKey";
 const AUTH_TOKEN_KEY: string = "AuthTokenKey";
 
 class UserDataPresenter {
 
-    public constructor() {
-    }
+    public constructor() { }
 
     public saveToLocalStorage(currentUser: User, authToken: AuthToken): void {
         localStorage.setItem(CURRENT_USER_KEY, currentUser.toJson());

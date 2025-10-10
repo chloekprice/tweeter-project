@@ -1,5 +1,5 @@
 import { AuthToken, User } from "tweeter-shared";
-import UserService from "../models/UserService";
+import UserService from "../../models/UserService";
 
 
 export interface NavigateView {
@@ -29,9 +29,10 @@ class NavigatePresenter {
                     return toUser.alias;
                 }
             }
-            return "";
+
         } catch (error) {
             this.view.displayErrorMsg(`Failed to get user because of exception: ${error}`);
+        } finally {
             return "";
         }
     }
