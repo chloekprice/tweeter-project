@@ -14,14 +14,12 @@ class FolloweePresenter extends UserItemPresenter {
     }
 
     public async loadMoreItems(authToken: AuthToken, userAlias: string) {
-        try {
+        this.performThrowingFunction( async () => {
             const [newItems, hasMore] = await this.service.loadMoreFollowees(authToken, userAlias, PAGE_SIZE, this.lastItem);
             this.hasMoreItems = hasMore;
             this.lastItem = newItems.length > 0 ? newItems[newItems.length - 1] : null;
             this.view.addItems(newItems);
-        } catch (error) {
-           this.view.displayErrorMsg(`Failed to load followees because of exception: ${error}`);
-        }
+        }, "load followees")
     };
 }
 
