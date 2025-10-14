@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import { AuthToken, User, FakeData } from "tweeter-shared";
 import { useUserInfo, useUserInfoActions } from "../userInfo/UserInfoHooks";
 import { useMessageActions } from "../toaster/MessageHooks";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
+import NavigatePresenter, { NavigateView } from "../../presenters/Navigation/NavigatePresenter";
 
 interface NavigateToUserData {
     featurePath: String
@@ -16,12 +16,17 @@ function useNavigateToUser() {
         const { set } = useUserInfoActions();
         const { displayErrorMsg } = useMessageActions();
 
+        const observer: NavigateView = {
+              displayErrorMsg: displayErrorMsg
+          }
+        
+        const presenterRef = useRef<NavigatePresenter | null>(null)
+        if (!presenterRef.current) { presenterRef.current = new NavigatePresenter(observer); }
 
         event.preventDefault();
 
         try {
-            const alias = extractAlias(event.target.toString());
-            const toUser = await getUser(userInfo.authToken!, alias);
+            const toUser = await presenterRef.current!.getUser(userInfo.authToken!, event.target.toString());
 
             if (toUser) {
                 if (!toUser.equals(userInfo.displayedUser!)) {
@@ -30,27 +35,12 @@ function useNavigateToUser() {
                 }
             }
         } catch (error) {
-            displayErrorMsg(
-            `Failed to get user because of exception: ${error}`,
-            );
+            displayErrorMsg(`Failed to get user because of exception: ${error}`);
         }
     }, []);
 
     return { navigateToUser }
 }
-
-const extractAlias = (value: string): string => {
-    const index = value.indexOf("@");
-    return value.substring(index);
-};
-
-const getUser = async (
-    authToken: AuthToken,
-    alias: string
-    ): Promise<User | null> => {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.findUserByAlias(alias);
-};
 
 
 export default useNavigateToUser;
