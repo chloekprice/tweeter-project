@@ -13,14 +13,12 @@ class StoryPresenter extends StatusItemPresenter {
     }
 
     public async loadMoreItems(authToken: AuthToken, userAlias: string): Promise<void> {
-        try {
+        await this.performThrowingFunction( async () => {
             const [newItems, hasMore] = await this.service.loadMoreStoryStatuses(authToken, userAlias, PAGE_SIZE, this.lastItem);
             this.hasMoreItems = hasMore;
             this.lastItem = newItems.length > 0 ? newItems[newItems.length - 1] : null;
             this.view.addItems(newItems);
-        } catch (error) {
-            this.view.displayErrorMsg(`Failed to load story items because of exception: ${error}`);
-        }
+        }, "load story items") 
     }
 }
 
