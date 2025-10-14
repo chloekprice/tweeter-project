@@ -1,11 +1,9 @@
 import { AuthToken, User } from "tweeter-shared";
 import UserService from "../../models/UserService";
 import { NavigateFunction } from "react-router-dom";
-import BasePresenter, { PresenterView } from "../BasePresenter";
+import BasePresenter, { EnhancedView } from "../BasePresenter";
 
-export interface UserInfoView extends PresenterView {
-    deleteMsg: (_toast: string) => void
-    displayInfoMsg: (message: string, duration: number, bootstrapClasses?: string | undefined) => string
+export interface UserInfoView extends EnhancedView {
     setUser: (user: User) => void
     navigate: NavigateFunction
     setIsFollower: (isFollower: boolean) => void

@@ -1,11 +1,8 @@
 import { AuthToken } from "tweeter-shared/dist/model/domain/AuthToken";
 import AuthenticationService from "../../models/AuthenticationService";
-import BasePresenter, { PresenterView } from "../BasePresenter";
+import BasePresenter, { EnhancedView } from "../BasePresenter";
 
-export interface NavbarView  extends PresenterView{
-    deleteMsg: (_toast: string) => void
-    displayInfoMsg: (message: string, duration: number, bootstrapClasses?: string | undefined) => string
-}
+export interface NavbarView extends EnhancedView { }
 
 class NavbarPresenter extends BasePresenter<NavbarView> {
     private authService: AuthenticationService;
