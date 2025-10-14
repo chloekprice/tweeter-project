@@ -1,6 +1,6 @@
 import { AuthToken, User, Status } from "tweeter-shared";
-import UserService from "../../models/UserService";
-import BasePresenter, { PresenterView } from "../BasePresenter";
+import UserService from "../../../models/UserService";
+import BasePresenter, { PresenterView } from "../../BasePresenter";
 
 export interface StatusItemView extends PresenterView {
     addItems: (items: Status[]) => void

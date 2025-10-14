@@ -1,6 +1,6 @@
 import { AuthToken, User } from "tweeter-shared";
-import UserService from "../../models/UserService";
-import BasePresenter, { PresenterView } from "../BasePresenter";
+import UserService from "../../../models/UserService";
+import BasePresenter, { PresenterView } from "../../BasePresenter";
 
 
 export interface UserItemView extends PresenterView {
