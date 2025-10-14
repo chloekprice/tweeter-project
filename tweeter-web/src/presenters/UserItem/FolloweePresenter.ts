@@ -14,7 +14,7 @@ class FolloweePresenter extends UserItemPresenter {
     }
 
     public async loadMoreItems(authToken: AuthToken, userAlias: string) {
-        this.performThrowingFunction( async () => {
+        await this.performThrowingFunction( async () => {
             const [newItems, hasMore] = await this.service.loadMoreFollowees(authToken, userAlias, PAGE_SIZE, this.lastItem);
             this.hasMoreItems = hasMore;
             this.lastItem = newItems.length > 0 ? newItems[newItems.length - 1] : null;

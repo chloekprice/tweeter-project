@@ -1,32 +1,27 @@
 import { AuthToken, User } from "tweeter-shared";
 import UserService from "../../models/UserService";
+import BasePresenter, { PresenterView } from "../BasePresenter";
 
 
-export interface NavigateView {
-    displayErrorMsg: (message: string, bootstrapClasses?: string | undefined) => string
+export interface NavigateView extends PresenterView {
 }
 
-class NavigatePresenter {
+class NavigatePresenter extends BasePresenter<NavigateView> {
     private userService: UserService;
-    private _view: NavigateView;
 
     public constructor(view: NavigateView) {
+        super(view);
         this.userService = new UserService();
-        this._view = view;
     }
 
-    public get view(): NavigateView { return this._view; }
 
     public async getUser(authToken: AuthToken, target: string): Promise<User | null> {
-        try {
+        let toUser: User | null = null;
+        await this.performThrowingFunction( async () => {
             const alias = this.extractAlias(target);
-            const toUser = await this.userService.getUser(authToken, alias);
-            return toUser;
-        } catch (error) {
-            this.view.displayErrorMsg(`Failed to get user because of exception: ${error}`);
-        } finally {
-            return null;
-        }
+            toUser = await this.userService.getUser(authToken, alias);
+        }, "get user")
+        return toUser;
     }
     
     public extractAlias(value: string): string {

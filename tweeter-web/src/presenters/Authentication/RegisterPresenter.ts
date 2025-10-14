@@ -1,9 +1,9 @@
 import { Buffer } from "buffer";
 import { User, AuthToken } from "tweeter-shared";
 import AuthenticationService from "../../models/AuthenticationService";
+import BasePresenter, { PresenterView } from "../BasePresenter";
 
-export interface RegisterView {
-    displayErrorMsg: (message: string, bootstrapClasses?: string | undefined) => string
+export interface RegisterView extends PresenterView {
     setAlias: (alias: string) => void
     setPassword: (password: string) => void
     setRememberMe: (rememberMe: boolean) => void
@@ -14,19 +14,16 @@ export interface RegisterView {
     update: (currentUser: User, displayedUser: User | null, authToken: AuthToken, remember: boolean) => void 
 }
 
-class RegisterPresenter {
+class RegisterPresenter extends BasePresenter<RegisterView> {
     protected authService: AuthenticationService;
-    private _view: RegisterView;
 
     public constructor(view: RegisterView) {
+        super(view);
         this.authService = new AuthenticationService();
-        this._view = view;
     }
 
-    public get view(): RegisterView { return this._view; };
-
     public async doRegister(firstName: string, lastName: string, alias: string, password: string, imageBytes: Uint8Array, imageFileExtension: string, rememberMe: boolean) {
-        try {
+        await this.performThrowingFunction( async() => {
             this.view.setIsLoading(true);
             const [user, authToken] = await this.authService.register(
                 firstName,
@@ -37,11 +34,7 @@ class RegisterPresenter {
                 imageFileExtension
             );
             this.view.update(user, user, authToken, rememberMe);
-        } catch (error) {
-            this.view.displayErrorMsg(`Failed to register user because of exception: ${error}`);
-        } finally {
-            this.view.setIsLoading(false);
-        }
+        }, "register user").then(() => { this.view.setIsLoading(false); })
     }
 
     public getFileExtension(file: File): string | undefined {
