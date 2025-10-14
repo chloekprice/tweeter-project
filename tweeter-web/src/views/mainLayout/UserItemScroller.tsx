@@ -5,11 +5,12 @@ import { useParams } from "react-router-dom";
 import UserItem from "../userItem/UserItem";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { useUserInfo, useUserInfoActions } from "../userInfo/UserInfoHooks";
-import UserItemPresenter, { UserItemView } from "../../presenters/UserItem/UserItemPresenter";
+import { ItemView } from "../../presenters/Items/ItemPresenter";
+import UserItemPresenter from "../../presenters/Items/UserItem/UserItemPresenter";
 
 interface Props {
     featureURL: string
-    presenterFactory: (observer: UserItemView) => UserItemPresenter
+    presenterFactory: (observer: ItemView<User>) => UserItemPresenter
 }
 
 
@@ -21,7 +22,7 @@ const UserItemScroller = (props: Props) => {
     const { set } = useUserInfoActions();
     const { displayedUser: displayedUserAliasParam } = useParams();
 
-    const observer: UserItemView = {
+    const observer: ItemView<User> = {
         addItems: (items: User[]) => setItems((previousItems) => [...previousItems, ...items]),
         displayErrorMsg: displayErrorMsg
     }

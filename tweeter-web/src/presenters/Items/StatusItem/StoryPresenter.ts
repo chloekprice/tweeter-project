@@ -2,6 +2,7 @@ import { AuthToken, Status, User } from "tweeter-shared";
 import StatusItemPresenter from "./StatusItemPresenter";
 import { PAGE_SIZE } from "../ItemPresenter";
 
+
 class StoryPresenter extends StatusItemPresenter {
 
     protected getItemDescription(): string {

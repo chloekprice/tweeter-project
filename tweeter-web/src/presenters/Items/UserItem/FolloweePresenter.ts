@@ -2,6 +2,7 @@ import { AuthToken, User } from "tweeter-shared";
 import UserItemPresenter from "./UserItemPresenter";
 import { PAGE_SIZE } from "../ItemPresenter";
 
+
 class FolloweePresenter extends UserItemPresenter {
     
     protected getItemDescription(): string {

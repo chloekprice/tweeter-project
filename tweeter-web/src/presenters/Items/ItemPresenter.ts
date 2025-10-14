@@ -1,6 +1,7 @@
 import { AuthToken, User } from "tweeter-shared";
 import UserService from "../../models/UserService";
 import BasePresenter, { PresenterView } from "../BasePresenter";
+import { Service } from "../../models/Service";
 
 
 export const PAGE_SIZE = 10;
@@ -15,7 +16,7 @@ abstract class ItemPresenter<T, S extends Service> extends BasePresenter<ItemVie
     private userService: UserService;
     private _service: S;
 
-    protected constructor(view: ItemView<T>) {
+    public constructor(view: ItemView<T>) {
         super(view);
         this.userService = new UserService();
         this._service = this.serviceFactory();

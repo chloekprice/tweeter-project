@@ -1,4 +1,5 @@
 import { AuthToken, FakeData, Status } from "tweeter-shared";
+import { Service } from "./Service";
 
 
 class StatusService implements Service {
