@@ -1,7 +1,7 @@
 import { AuthToken, FakeData, Status } from "tweeter-shared";
 
 
-class StatusService {
+class StatusService implements Service {
 
     public async loadMoreFeedStatuses (authToken: AuthToken, userAlias: string, pageSize: number, lastStatus: Status | null): Promise<[Status[], boolean]>  {
         // TODO: Replace with the result of calling server

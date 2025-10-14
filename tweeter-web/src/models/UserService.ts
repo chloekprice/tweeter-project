@@ -1,7 +1,7 @@
 import { AuthToken, User, FakeData } from "tweeter-shared";
 
 
-class UserService {
+class UserService implements Service {
 
     
     public async follow(authToken: AuthToken, userToFollow: User): Promise<[followerCount: number, followeeCount: number]>  {

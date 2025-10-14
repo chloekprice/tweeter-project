@@ -9,7 +9,7 @@ export interface EnhancedView extends PresenterView {
     displayInfoMsg: (message: string, duration: number, bootstrapClasses?: string | undefined) => string
 }
 
-abstract class BasePresenter< V extends PresenterView> {
+abstract class BasePresenter<V extends PresenterView> {
     private _view: V;
 
     protected constructor(view: V) {
