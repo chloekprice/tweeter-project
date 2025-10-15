@@ -1,7 +1,8 @@
 import { AuthToken, User, FakeData } from "tweeter-shared";
+import { Service } from "./Service";
 
 
-class FollowService {
+class FollowService implements Service {
 
     public async loadMoreFollowees (authToken: AuthToken, userAlias: string, pageSize: number, lastFollowee: User | null): Promise<[User[], boolean]>  {
         // TODO: Replace with the result of calling server

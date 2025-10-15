@@ -1,47 +1,33 @@
 import { Buffer } from "buffer";
 import { User, AuthToken } from "tweeter-shared";
-import AuthenticationService from "../../models/AuthenticationService";
+import AuthenticationPresenter, { AuthenticationView, AuthenticationInfo } from "./AuthenticationPresenter";
 
-export interface RegisterView {
-    displayErrorMsg: (message: string, bootstrapClasses?: string | undefined) => string
-    setAlias: (alias: string) => void
-    setPassword: (password: string) => void
-    setRememberMe: (rememberMe: boolean) => void
-    setIsLoading: (isLoading: boolean) => void
+
+export interface RegisterView extends AuthenticationView {
     setImageUrl: (imageUrl: string) => void
     setImageBytes: (imageBytes: Uint8Array) => void
     setImageFileExtension: (imageFileExtension: string) => void
-    update: (currentUser: User, displayedUser: User | null, authToken: AuthToken, remember: boolean) => void 
 }
 
-class RegisterPresenter {
-    protected authService: AuthenticationService;
-    private _view: RegisterView;
+export interface RegisterInfo extends AuthenticationInfo {
+  firstName: string
+  lastName: string
+  imageBytes: Uint8Array
+  imageFileExtension: string
+}
 
-    public constructor(view: RegisterView) {
-        this.authService = new AuthenticationService();
-        this._view = view;
+
+class RegisterPresenter extends AuthenticationPresenter<RegisterView, RegisterInfo> {
+
+    constructor(view: RegisterView) {
+        super(view)
     }
 
-    public get view(): RegisterView { return this._view; };
-
-    public async doRegister(firstName: string, lastName: string, alias: string, password: string, imageBytes: Uint8Array, imageFileExtension: string, rememberMe: boolean) {
-        try {
-            this.view.setIsLoading(true);
-            const [user, authToken] = await this.authService.register(
-                firstName,
-                lastName,
-                alias,
-                password,
-                imageBytes,
-                imageFileExtension
-            );
-            this.view.update(user, user, authToken, rememberMe);
-        } catch (error) {
-            this.view.displayErrorMsg(`Failed to register user because of exception: ${error}`);
-        } finally {
-            this.view.setIsLoading(false);
-        }
+    protected async authenticate(authInfo: RegisterInfo): Promise<[User, AuthToken]> {
+        return await this.service.register(authInfo.firstName, authInfo.lastName, authInfo.alias, authInfo.password, authInfo.imageBytes, authInfo.imageFileExtension)
+    }
+    protected getAuthDescription(): string {
+        return "register user";
     }
 
     public getFileExtension(file: File): string | undefined {

@@ -10,17 +10,21 @@ import Login from "./views/authentication/login/Login";
 import Register from "./views/authentication/register/Register";
 import MainLayout from "./views/mainLayout/MainLayout";
 import Toaster from "./views/toaster/Toaster";
-import UserItemScroller from "./views/mainLayout/UserItemScroller";
-import StatusItemScroller from "./views/mainLayout/StatusItemScroller";
 import { useUserInfo } from "./views/userInfo/UserInfoHooks";
-import FolloweePresenter from "./presenters/UserItem/FolloweePresenter";
-import { UserItemView } from "./presenters/UserItem/UserItemPresenter";
-import FollowerPresenter from "./presenters/UserItem/FollowerPresenter";
-import FeedPresenter from "./presenters/StatusItem/FeedPresenter";
-import { StatusItemView } from "./presenters/StatusItem/StatusItemPresenter";
-import StoryPresenter from "./presenters/StatusItem/StoryPresenter";
-import LoginPresenter, { LoginView } from "./presenters/Authentication/LoginPresenter";
-import RegisterPresenter, { RegisterView } from "./presenters/Authentication/RegisterPresenter";
+import { Status, User } from "tweeter-shared";
+import { ItemView } from "./presenters/Items/ItemPresenter";
+import FeedPresenter from "./presenters/Items/StatusItem/FeedPresenter";
+import StoryPresenter from "./presenters/Items/StatusItem/StoryPresenter";
+import FolloweePresenter from "./presenters/Items/UserItem/FolloweePresenter";
+import FollowerPresenter from "./presenters/Items/UserItem/FollowerPresenter";
+import ItemScroller from "./views/mainLayout/ItemScroller";
+import StatusItemPresenter from "./presenters/Items/StatusItem/StatusItemPresenter";
+import StatusService from "./models/StatusService";
+import StatusItem from "./views/statusItem/StatusItem";
+import UserItem from "./views/userItem/UserItem";
+import UserItemPresenter from "./presenters/Items/UserItem/UserItemPresenter";
+import FollowService from "./models/FollowService";
+
 
 const App = () => {
   const userInfo = useUserInfo();
@@ -46,25 +50,34 @@ const App = () => {
 const AuthenticatedRoutes = () => {
   const userInfo = useUserInfo();
 
+  
+  const statusItemComponent = (item: Status, index: number, pageUrl: string): JSX.Element => {
+    return <StatusItem status={item} index={index} pageUrl={pageUrl}/>
+  }
+
+  const userItemComponent = (item: User, index: number, pageUrl: string): JSX.Element => {
+    return <UserItem user={item} featurePath={pageUrl}/>
+  }
+
   return (
     <Routes>
       <Route element={<MainLayout />}>
         <Route index element={<Navigate to={`/feed/${userInfo.displayedUser!.alias}`} />} />
         <Route 
           path="feed/:displayedUser" 
-          element={<StatusItemScroller key={`/feed/${userInfo.displayedUser!.alias}`} urlPath={"feed"} presenterFactory={(view: StatusItemView) => new FeedPresenter(view)} /> }
+          element={<ItemScroller<Status, StatusService, StatusItemPresenter> key={`/feed/${userInfo.displayedUser!.alias}`} urlPath={"feed"} presenterFactory={(view: ItemView<Status>) => new FeedPresenter(view)} itemComponent={statusItemComponent} /> }
         />
         <Route 
           path="story/:displayedUser" 
-          element={<StatusItemScroller key={`/story/${userInfo.displayedUser!.alias}`} urlPath={"story"} presenterFactory={(view: StatusItemView) => new StoryPresenter(view)} /> }
+          element={<ItemScroller<Status, StatusService, StatusItemPresenter> key={`/story/${userInfo.displayedUser!.alias}`} urlPath={"story"} presenterFactory={(view: ItemView<Status>) => new StoryPresenter(view)} itemComponent={statusItemComponent} /> }
         />
         <Route 
           path="followees/:displayedUser" 
-          element={ <UserItemScroller key={`/followees/${userInfo.displayedUser!.alias}`} featureURL={"/followees"} presenterFactory={(view: UserItemView) => new FolloweePresenter(view)} /> } 
+          element={<ItemScroller<User, FollowService, UserItemPresenter> key={`/followees/${userInfo.displayedUser!.alias}`} urlPath={"/followees"} presenterFactory={(view: ItemView<User>) => new FolloweePresenter(view)} itemComponent={userItemComponent} /> }
         />
         <Route
-          path="followers/:displayedUser" 
-          element={<UserItemScroller key={`/followers/${userInfo.displayedUser!.alias}`} featureURL={"/followers"} presenterFactory={(view: UserItemView) => new FollowerPresenter(view)} /> }
+          path="followers/:displayedUser"
+          element={<ItemScroller<User, FollowService, UserItemPresenter> key={`/followers/${userInfo.displayedUser!.alias}`} urlPath={"/followers"} presenterFactory={(view: ItemView<User>) => new FollowerPresenter(view)} itemComponent={userItemComponent} /> } 
         />
         <Route path="logout" element={<Navigate to="/login" />} />
         <Route 

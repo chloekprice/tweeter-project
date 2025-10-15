@@ -1,36 +1,20 @@
 import { User, AuthToken } from "tweeter-shared";
-import AuthenticationService from "../../models/AuthenticationService";
+import AuthenticationPresenter, { AuthenticationInfo, AuthenticationView } from "./AuthenticationPresenter";
 
-export interface LoginView {
-    displayErrorMsg: (message: string, bootstrapClasses?: string | undefined) => string
-    setAlias: (alias: string) => void
-    setPassword: (password: string) => void
-    setRememberMe: (rememberMe: boolean) => void
-    setIsLoading: (isLoading: boolean) => void
-    update: (currentUser: User, displayedUser: User | null, authToken: AuthToken, remember: boolean) => void 
-}
+export interface LoginView extends AuthenticationView { }
+export interface LoginInfo extends AuthenticationInfo { }
 
-class LoginPresenter {
-    protected authService: AuthenticationService;
-    private _view: LoginView;
+class LoginPresenter extends AuthenticationPresenter<LoginView, LoginInfo> {
 
-    public constructor(view: LoginView) {
-        this.authService = new AuthenticationService();
-        this._view = view;
+    constructor(view: LoginView) {
+        super(view)
     }
 
-    public get view(): LoginView { return this._view; };
-
-    public async doLogin(alias: string, password: string, rememberMe: boolean): Promise<void> {
-        try {
-            this.view.setIsLoading(true);
-            const [user, authToken] = await this.authService.login(alias, password);
-            this.view.update(user, user, authToken, rememberMe);
-        } catch (error) {
-            this.view.displayErrorMsg(`Failed to log user in because of exception: ${error}`);
-        } finally {
-            this.view.setIsLoading(false);
-        }
+    protected async authenticate(authInfo: AuthenticationInfo): Promise<[User, AuthToken]> {
+        return await this.service.login(authInfo.alias, authInfo.password)
+    }
+    protected getAuthDescription(): string {
+        return "log user in";
     }
 }
 

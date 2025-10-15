@@ -45,7 +45,7 @@ const Login = (props: Props) => {
   };
 
   const doLogin = async () => {
-      await presenterRef.current!.doLogin(alias, password, rememberMe);
+      await presenterRef.current!.doAuth({ alias, password }, rememberMe);
       if (props.originalUrl == "/") {
           navigate(`/feed/${alias}`);
       } else if (!!props.originalUrl) {
