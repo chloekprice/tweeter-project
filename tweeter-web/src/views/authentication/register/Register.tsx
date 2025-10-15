@@ -62,7 +62,7 @@ const Register = () => {
   };
 
   const doRegister = async () => {
-      presenterRef.current!.doRegister(firstName, lastName, alias, password, imageBytes, imageFileExtension, rememberMe);
+      presenterRef.current!.doAuth( { firstName, lastName, alias, password, imageBytes, imageFileExtension }, rememberMe);
       navigate(`/feed/${alias}`);
   };
 

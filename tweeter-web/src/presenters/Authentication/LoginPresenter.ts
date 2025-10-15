@@ -1,29 +1,20 @@
 import { User, AuthToken } from "tweeter-shared";
-import AuthenticationService from "../../models/AuthenticationService";
-import BasePresenter, { PresenterView } from "../BasePresenter";
+import AuthenticationPresenter, { AuthenticationInfo, AuthenticationView } from "./AuthenticationPresenter";
 
-export interface LoginView extends PresenterView {
-    setAlias: (alias: string) => void
-    setPassword: (password: string) => void
-    setRememberMe: (rememberMe: boolean) => void
-    setIsLoading: (isLoading: boolean) => void
-    update: (currentUser: User, displayedUser: User | null, authToken: AuthToken, remember: boolean) => void 
-}
+export interface LoginView extends AuthenticationView { }
+export interface LoginInfo extends AuthenticationInfo { }
 
-class LoginPresenter extends BasePresenter<LoginView> {
-    protected authService: AuthenticationService;
+class LoginPresenter extends AuthenticationPresenter<LoginView, LoginInfo> {
 
-    public constructor(view: LoginView) {
-        super(view);
-        this.authService = new AuthenticationService();
+    constructor(view: LoginView) {
+        super(view)
     }
 
-    public async doLogin(alias: string, password: string, rememberMe: boolean): Promise<void> {
-        await this.performThrowingFunction( async() => {
-            this.view.setIsLoading(true);
-            const [user, authToken] = await this.authService.login(alias, password);
-            this.view.update(user, user, authToken, rememberMe);
-        }, "log user in").then( () => { this.view.setIsLoading(false); })
+    protected async authenticate(authInfo: AuthenticationInfo): Promise<[User, AuthToken]> {
+        return await this.service.login(authInfo.alias, authInfo.password)
+    }
+    protected getAuthDescription(): string {
+        return "log user in";
     }
 }
 
