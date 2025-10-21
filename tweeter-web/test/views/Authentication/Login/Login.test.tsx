@@ -23,6 +23,27 @@ describe("Login View", () => {
 
         expect(signInButton).toBeEnabled();
     })
+
+    it("disables the sign in button if text is removed from alias or password fields", async () => {
+        const { signInButton, aliasField, passwordField, user } = renderLoginAndGetElements("/");
+
+        await user.type(aliasField, "q");
+        await user.type(passwordField, "t");
+
+        expect(signInButton).toBeEnabled();
+
+        await user.clear(aliasField);
+        expect(signInButton).toBeDisabled();
+
+        await user.type(aliasField, "w");
+        expect(signInButton).toBeEnabled();
+
+        await user.clear(passwordField);
+        expect(signInButton).toBeDisabled();
+
+        await user.type(passwordField, "s");
+        expect(signInButton).toBeEnabled();
+    })
 })
 
 function renderLogin(originalUrl: string) {
