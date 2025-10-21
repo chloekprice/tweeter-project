@@ -52,4 +52,18 @@ describe("PostPresenter", () => {
         verify(mockPostPresenterView.setPost("")).once();
         verify(mockPostPresenterView.deleteMsg("messageId")).once();
     })
+
+    it("tells the view to clear the info message and display an error message but does not tell it to clear the post or display a status posted message, when unsuccessful post", async () => {
+        let error = new Error("an error occurred");
+        const mockPost = "dummy post"
+        const mockUser = new User("fake", "user", "@fake", "image");
+    
+        when(mockService.postStatus(authToken, anything())).thenThrow(error);
+        await postPresenterSpyInstance.submitPost(mockPost, mockUser, authToken);
+
+        verify(mockPostPresenterView.displayInfoMsg("Status posted!", anything())).never()
+        verify(mockPostPresenterView.setPost("")).never();
+        verify(mockPostPresenterView.deleteMsg("messageId")).once();
+        verify(mockPostPresenterView.displayErrorMsg("Failed to post the status because of exception: an error occurred")).once();
+    })
 })
