@@ -20,10 +20,12 @@ jest.mock("../../../src/views/userInfo/UserInfoHooks", () => ({
 }));      
 
 describe("Post Status View", () => {
+    let mockUserInstance: User;
+    let mockAuthTokenInstance: AuthToken;
 
     beforeAll( () => {
-        const mockUserInstance = instance(mock<User>());
-        const mockAuthTokenInstance = instance(mock<AuthToken>());
+        mockUserInstance = instance(mock<User>());
+        mockAuthTokenInstance = instance(mock<AuthToken>());
 
         (useUserInfo as jest.Mock).mockReturnValue({
             currentUser: mockUserInstance,
@@ -55,6 +57,21 @@ describe("Post Status View", () => {
         await user.clear(statusField);
         expect(clearButton).toBeDisabled();
         expect(postButton).toBeDisabled();
+    })
+
+    it("calls the presenter's postStatus method with correct parameters when the Post Status button is pressed", async () => {
+        const mockPresenter: PostPresenter = mock<PostPresenter>();
+        const mockPresenterInstance: PostPresenter = instance(mockPresenter);
+
+        const postStatus: string = "hey!";
+        const { clearButton, postButton, user, statusField } = renderPostStatusAndGetElements(mockPresenterInstance);
+
+        await user.type(statusField, "hey");
+        expect(clearButton).toBeEnabled();
+        expect(postButton).toBeEnabled();
+
+        await user.click(postButton);
+        verify(mockPresenter.submitPost(postStatus, mockUserInstance, mockAuthTokenInstance)).once();
     })
 })
 
