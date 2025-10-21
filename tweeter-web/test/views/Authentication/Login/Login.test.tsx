@@ -31,7 +31,6 @@ describe("Login View", () => {
 
         await user.type(aliasField, "q");
         await user.type(passwordField, "t");
-
         expect(signInButton).toBeEnabled();
 
         await user.clear(aliasField);

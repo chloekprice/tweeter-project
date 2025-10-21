@@ -13,7 +13,8 @@ jest.mock("../../../src/views/userInfo/UserInfoHooks", () => ({
   ...jest.requireActual("../../../src/views/userInfo/UserInfoHooks"),
   __esModule: true,
   useUserInfo: jest.fn(),
-}));      
+}));  
+    
 
 describe("Post Status View", () => {
     let mockUserInstance: User;
