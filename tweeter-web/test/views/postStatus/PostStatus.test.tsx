@@ -66,12 +66,12 @@ describe("Post Status View", () => {
         const postStatus: string = "hey!";
         const { clearButton, postButton, user, statusField } = renderPostStatusAndGetElements(mockPresenterInstance);
 
-        await user.type(statusField, "hey");
+        await user.type(statusField, "hey!");
         expect(clearButton).toBeEnabled();
         expect(postButton).toBeEnabled();
 
         await user.click(postButton);
-        verify(mockPresenter.submitPost(postStatus, mockUserInstance, mockAuthTokenInstance)).once();
+        verify(mockPresenter.submitPost(postStatus, deepEqual(mockUserInstance), deepEqual(mockAuthTokenInstance))).once();
     })
 })
 
@@ -81,7 +81,7 @@ function renderPostStatus(presenter?: PostPresenter) {
             {!!presenter ? (
                 <PostStatus presenter={presenter} /> 
                 ) : (
-                <PostStatus/>
+                <PostStatus />
             )}
         </MemoryRouter>
     );
