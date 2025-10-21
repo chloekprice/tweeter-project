@@ -44,6 +44,18 @@ describe("Post Status View", () => {
         expect(clearButton).toBeEnabled();
         expect(postButton).toBeEnabled();
     })
+
+    it("disables post status and clear buttons when the text field is cleared", async () => {
+        const { clearButton, postButton, user, statusField } = renderPostStatusAndGetElements();
+
+        await user.type(statusField, "hey");
+        expect(clearButton).toBeEnabled();
+        expect(postButton).toBeEnabled();
+
+        await user.clear(statusField);
+        expect(clearButton).toBeDisabled();
+        expect(postButton).toBeDisabled();
+    })
 })
 
 function renderPostStatus(presenter?: PostPresenter) {
