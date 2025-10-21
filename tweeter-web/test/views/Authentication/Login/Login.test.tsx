@@ -10,9 +10,18 @@ library.add(fab);
 
 describe("Login View", () => {
 
-    it("starts with the sign in button disabled", async () => {
+    it("starts with the sign in button disabled", () => {
         const { signInButton } = renderLoginAndGetElements("/");
         expect(signInButton).toBeDisabled();
+    })
+
+    it("enables sign in button if both alias and password fields are filled", async () => {
+        const { signInButton, aliasField, passwordField, user } = renderLoginAndGetElements("/");
+
+        await user.type(aliasField, "q");
+        await user.type(passwordField, "t");
+
+        expect(signInButton).toBeEnabled();
     })
 })
 
