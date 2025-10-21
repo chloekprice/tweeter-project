@@ -5,12 +5,14 @@ import BasePresenter, { EnhancedView } from "../BasePresenter";
 export interface NavbarView extends EnhancedView { }
 
 class NavbarPresenter extends BasePresenter<NavbarView> {
-    private authService: AuthenticationService;
+    private _authService: AuthenticationService;
 
     public constructor(view: NavbarView) { 
         super(view);
-        this.authService = new AuthenticationService();
+        this._authService = new AuthenticationService();
     }
+
+    public get authService(): AuthenticationService { return this._authService; }
 
     public async logout(authToken: AuthToken): Promise<void> {
         await this.performThrowingFunction( async () => {
