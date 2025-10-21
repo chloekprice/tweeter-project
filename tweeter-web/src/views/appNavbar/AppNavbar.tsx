@@ -17,7 +17,8 @@ const AppNavbar = () => {
   const observer: NavbarView = {
       displayErrorMsg: displayErrorMsg,
       deleteMsg: deleteMsg,
-      displayInfoMsg: displayInfoMsg
+      displayInfoMsg: displayInfoMsg,
+      clearUserInfo: clear
   }
 
   const presenterRef = useRef<NavbarPresenter | null>(null)
@@ -25,7 +26,6 @@ const AppNavbar = () => {
 
   const logOut = async () => {
     await presenterRef.current!.logout(userInfo.authToken!);
-    clear();
     navigate("/login");
   };
 

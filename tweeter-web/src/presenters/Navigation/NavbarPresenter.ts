@@ -2,7 +2,9 @@ import { AuthToken } from "tweeter-shared/dist/model/domain/AuthToken";
 import AuthenticationService from "../../models/AuthenticationService";
 import BasePresenter, { EnhancedView } from "../BasePresenter";
 
-export interface NavbarView extends EnhancedView { }
+export interface NavbarView extends EnhancedView { 
+    clearUserInfo: () => void
+}
 
 class NavbarPresenter extends BasePresenter<NavbarView> {
     private _authService: AuthenticationService;
@@ -19,6 +21,7 @@ class NavbarPresenter extends BasePresenter<NavbarView> {
             const loggingOutToastId = this.view.displayInfoMsg("Logging Out...", 0);
             await this.authService.logUserOut(authToken);
             this.view.deleteMsg(loggingOutToastId);
+            this.view.clearUserInfo();
         }, "log user out")
     }
 }

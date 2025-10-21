@@ -33,4 +33,11 @@ describe("NavbarPresenter", () => {
         await navbarPresenterSpyInstance.logout(authToken);
         verify(mockService.logUserOut(authToken)).once();
     })
+
+    it("tells the view to clear the info message that was displayed previously and clears the user info when successful", async () => {
+        await navbarPresenterSpyInstance.logout(authToken);
+
+        verify(mockNavbarPresenterView.deleteMsg(anything())).once();
+        verify(mockNavbarPresenterView.clearUserInfo()).once();
+    })
 })
