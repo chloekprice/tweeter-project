@@ -7,11 +7,29 @@ import { fab } from "@fortawesome/free-brands-svg-icons"
 import { library } from "@fortawesome/fontawesome-svg-core";
 import PostPresenter from "../../../src/presenters/PostPresenter";
 import { deepEqual, instance, mock, verify } from "@typestrong/ts-mockito";
-import { stat } from "fs";
+import { useUserInfo } from "../../../src/views/userInfo/UserInfoHooks";
+import { AuthToken, User } from "tweeter-shared";
 
 library.add(fab);
 
+
+jest.mock("../../../src/views/userInfo/UserInfoHooks", () => ({
+  ...jest.requireActual("../../../src/views/userInfo/UserInfoHooks"),
+  __esModule: true,
+  useUserInfo: jest.fn(),
+}));      
+
 describe("Post Status View", () => {
+
+    beforeAll( () => {
+        const mockUserInstance = instance(mock<User>());
+        const mockAuthTokenInstance = instance(mock<AuthToken>());
+
+        (useUserInfo as jest.Mock).mockReturnValue({
+            currentUser: mockUserInstance,
+            authToken: mockAuthTokenInstance,
+});      
+    })
 
     it("first renders the Post Status and Clear buttons as disabled", () => {
         const { clearButton, postButton } = renderPostStatusAndGetElements();
