@@ -5,6 +5,8 @@ import { userEvent } from "@testing-library/user-event";
 import "@testing-library/jest-dom"
 import { fab } from "@fortawesome/free-brands-svg-icons"
 import { library } from "@fortawesome/fontawesome-svg-core";
+import LoginPresenter from "../../../../src/presenters/Authentication/LoginPresenter";
+import { deepEqual, instance, mock, verify } from "@typestrong/ts-mockito";
 
 library.add(fab);
 
@@ -44,19 +46,40 @@ describe("Login View", () => {
         await user.type(passwordField, "s");
         expect(signInButton).toBeEnabled();
     })
+
+    it("calls presenter's login method with correct parameters when the sign-in button is pressed", async () => {
+        const mockPresenter: LoginPresenter = mock<LoginPresenter>();
+        const mockPresenterInstance: LoginPresenter = instance(mockPresenter);
+
+        const alias: string = "@alias";
+        const password: string = "password";
+        const { signInButton, aliasField, passwordField, user } = renderLoginAndGetElements("/", mockPresenterInstance);
+
+        await user.type(aliasField, alias);
+        await user.type(passwordField, password);
+        expect(signInButton).toBeEnabled();
+
+        await user.click(signInButton);
+        verify(mockPresenter.doAuth(deepEqual({ alias, password }), false)).once();
+
+    })
 })
 
-function renderLogin(originalUrl: string) {
+function renderLogin(originalUrl: string, presenter?: LoginPresenter) {
     return render(
         <MemoryRouter>
-            <Login originalUrl={originalUrl} />
+            {!!presenter ? (
+                <Login originalUrl={originalUrl} presenter={presenter} /> 
+                ) : (
+                <Login originalUrl={originalUrl} />
+            )}
         </MemoryRouter>
     );
 }
 
-function renderLoginAndGetElements(originalUrl: string) {
+function renderLoginAndGetElements(originalUrl: string, presenter?: LoginPresenter) {
     const user = userEvent.setup();
-    renderLogin(originalUrl);
+    renderLogin(originalUrl, presenter);
 
     const signInButton = screen.getByRole("button", {name: /Sign in/});
     const aliasField = screen.getByLabelText("alias");
