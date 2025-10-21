@@ -1,7 +1,7 @@
 import { mock, instance, verify, anything, spy, when, capture } from "@typestrong/ts-mockito"
-import NavbarPresenter, { NavbarView } from "../../src/presenters/Navigation/NavbarPresenter"
+import NavbarPresenter, { NavbarView } from "../../../src/presenters/Navigation/NavbarPresenter"
 import { AuthToken } from "tweeter-shared";
-import AuthenticationService from "../../src/models/AuthenticationService";
+import AuthenticationService from "../../../src/models/AuthenticationService";
 
 describe("NavbarPresenter", () => {
     let mockNavbarPresenterView: NavbarView;
