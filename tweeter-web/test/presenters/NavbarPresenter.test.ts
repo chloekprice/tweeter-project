@@ -40,4 +40,12 @@ describe("NavbarPresenter", () => {
         verify(mockNavbarPresenterView.deleteMsg(anything())).once();
         verify(mockNavbarPresenterView.clearUserInfo()).once();
     })
+
+    it("tells the view to display an error message and does not tell it to clear the info message, clear the user info or navigate to the login page when unsuccessful", async () => {
+        let error = new Error("an error occurred");
+
+        when(mockService.logUserOut(anything())).thenThrow(error);
+
+        verify(mockNavbarPresenterView.displayErrorMsg("Failed to log userout because of exception: an error occurred"));
+    })
 })
