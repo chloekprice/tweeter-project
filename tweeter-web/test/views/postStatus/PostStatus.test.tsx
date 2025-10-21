@@ -7,6 +7,7 @@ import { fab } from "@fortawesome/free-brands-svg-icons"
 import { library } from "@fortawesome/fontawesome-svg-core";
 import PostPresenter from "../../../src/presenters/PostPresenter";
 import { deepEqual, instance, mock, verify } from "@typestrong/ts-mockito";
+import { stat } from "fs";
 
 library.add(fab);
 
@@ -16,6 +17,14 @@ describe("Post Status View", () => {
         const { clearButton, postButton } = renderPostStatusAndGetElements();
         expect(clearButton).toBeDisabled();
         expect(postButton).toBeDisabled();
+    })
+
+    it("enables post status and clear buttons when the text field has text", async () => {
+        const { clearButton, postButton, user, statusField } = renderPostStatusAndGetElements();
+
+        await user.type(statusField, "hey");
+        expect(clearButton).toBeEnabled();
+        expect(postButton).toBeEnabled();
     })
 })
 
