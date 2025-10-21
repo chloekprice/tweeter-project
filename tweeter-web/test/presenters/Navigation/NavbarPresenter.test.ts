@@ -1,4 +1,4 @@
-import { mock, instance, verify, anything, spy, when, capture } from "@typestrong/ts-mockito"
+import { mock, instance, verify, anything, spy, when } from "@typestrong/ts-mockito"
 import NavbarPresenter, { NavbarView } from "../../../src/presenters/Navigation/NavbarPresenter"
 import { AuthToken } from "tweeter-shared";
 import AuthenticationService from "../../../src/models/AuthenticationService";
