@@ -12,4 +12,32 @@ library.add(fab);
 
 describe("Post Status View", () => {
 
+    it("first renders the Post Status and Clear buttons as disabled", () => {
+        const { clearButton, postButton } = renderPostStatusAndGetElements();
+        expect(clearButton).toBeDisabled();
+        expect(postButton).toBeDisabled();
+    })
 })
+
+function renderPostStatus(presenter?: PostPresenter) {
+    return render(
+        <MemoryRouter>
+            {!!presenter ? (
+                <PostStatus presenter={presenter} /> 
+                ) : (
+                <PostStatus/>
+            )}
+        </MemoryRouter>
+    );
+}
+
+function renderPostStatusAndGetElements(presenter?: PostPresenter) {
+    const user = userEvent.setup();
+    renderPostStatus(presenter);
+
+    const clearButton = screen.getByRole("button", {name: /clear/});
+    const postButton = screen.getByRole("button", {name: /post/});
+    const statusField = screen.getByLabelText("status-content");
+
+    return { user, clearButton, postButton, statusField };
+}
