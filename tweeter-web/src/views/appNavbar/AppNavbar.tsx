@@ -18,7 +18,8 @@ const AppNavbar = () => {
       displayErrorMsg: displayErrorMsg,
       deleteMsg: deleteMsg,
       displayInfoMsg: displayInfoMsg,
-      clearUserInfo: clear
+      clearUserInfo: clear,
+      navigate: navigate
   }
 
   const presenterRef = useRef<NavbarPresenter | null>(null)
@@ -26,7 +27,6 @@ const AppNavbar = () => {
 
   const logOut = async () => {
     await presenterRef.current!.logout(userInfo.authToken!);
-    navigate("/login");
   };
 
 

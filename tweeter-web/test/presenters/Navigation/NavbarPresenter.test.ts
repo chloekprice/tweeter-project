@@ -35,11 +35,12 @@ describe("NavbarPresenter", () => {
         verify(mockService.logUserOut(authToken)).once();
     })
 
-    it("tells the view to clear the info message that was displayed previously and clears the user info when successful", async () => {
+    it("tells the view to clear the info message that was displayed previously, clears the user info, and navigates to the login page when successful", async () => {
         await navbarPresenterSpyInstance.logout(authToken);
 
         verify(mockNavbarPresenterView.deleteMsg("messageId")).once();
         verify(mockNavbarPresenterView.clearUserInfo()).once();
+        verify(mockNavbarPresenterView.navigate("/login")).once();
     })
 
     it("tells the view to display an error message and does not tell it to clear the info message or clear the user info when unsuccessful", async () => {
@@ -51,5 +52,6 @@ describe("NavbarPresenter", () => {
         verify(mockNavbarPresenterView.displayErrorMsg("Failed to log user out because of exception: an error occurred")).once();
         verify(mockNavbarPresenterView.deleteMsg("messageId")).never();
         verify(mockNavbarPresenterView.clearUserInfo()).never();
+        verify(mockNavbarPresenterView.navigate("/login")).never();
     })
 })

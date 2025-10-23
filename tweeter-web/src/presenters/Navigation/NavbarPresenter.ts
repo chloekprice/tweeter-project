@@ -4,6 +4,7 @@ import BasePresenter, { EnhancedView } from "../BasePresenter";
 
 export interface NavbarView extends EnhancedView { 
     clearUserInfo: () => void
+    navigate: (url: string) => void
 }
 
 class NavbarPresenter extends BasePresenter<NavbarView> {
@@ -22,6 +23,7 @@ class NavbarPresenter extends BasePresenter<NavbarView> {
             await this.authService.logUserOut(authToken);
             this.view.deleteMsg(loggingOutToastId);
             this.view.clearUserInfo();
+            this.view.navigate("/login");
         }, "log user out")
     }
 }
