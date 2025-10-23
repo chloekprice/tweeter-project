@@ -30,10 +30,10 @@ class PostPresenter extends BasePresenter<PostView> {
             await this.postService.postStatus(authToken, status);
 
             this.view.setPost("");
-            this.view.displayInfoMsg("Status posted!", 2000);
         }, "post the status").then( () => {
             this.view.deleteMsg(postingStatusToastId);
             this.view.setIsLoading(false);
+            this.view.displayInfoMsg("Status posted!", 2000);
         })
     }
 }
