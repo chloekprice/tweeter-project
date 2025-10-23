@@ -9,12 +9,14 @@ export interface PostView extends EnhancedView {
 }
 
 class PostPresenter extends BasePresenter<PostView> {
-    private postService: PostService;
+    private _postService: PostService;
 
     public constructor(view: PostView) {
         super(view);
-        this.postService = new PostService();
+        this._postService = new PostService();
     }
+
+    public get postService(): PostService { return this._postService; }
 
     public async submitPost(post: string, postUser: User, authToken: AuthToken) {    
         var postingStatusToastId = "";
@@ -28,10 +30,10 @@ class PostPresenter extends BasePresenter<PostView> {
             await this.postService.postStatus(authToken, status);
 
             this.view.setPost("");
-            this.view.displayInfoMsg("Status posted!", 2000);
         }, "post the status").then( () => {
             this.view.deleteMsg(postingStatusToastId);
             this.view.setIsLoading(false);
+            this.view.displayInfoMsg("Status posted!", 2000);
         })
     }
 }

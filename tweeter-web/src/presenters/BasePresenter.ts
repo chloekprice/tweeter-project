@@ -22,7 +22,7 @@ abstract class BasePresenter<V extends PresenterView> {
         try {
             await operation();
         } catch (error) {
-            this.view.displayErrorMsg(`Failed to ${description} because of exception: ${error}`);
+            this.view.displayErrorMsg(`Failed to ${description} because of exception: ${(error as Error).message}`);
         }
     };
 }
