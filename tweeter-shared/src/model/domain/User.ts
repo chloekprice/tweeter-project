@@ -1,3 +1,5 @@
+import { UserDto } from "../dto/UserDto";
+
 export class User {
   private _firstName: string;
   private _lastName: string;
@@ -16,26 +18,6 @@ export class User {
     this._imageUrl = imageUrl;
   }
 
-  public get firstName(): string {
-    return this._firstName;
-  }
-
-  public set firstName(value: string) {
-    this._firstName = value;
-  }
-
-  public get lastName(): string {
-    return this._lastName;
-  }
-
-  public set lastName(value: string) {
-    this._lastName = value;
-  }
-
-  public get name() {
-    return `${this.firstName} ${this.lastName}`;
-  }
-
   public get alias(): string {
     return this._alias;
   }
@@ -44,16 +26,29 @@ export class User {
     this._alias = value;
   }
 
-  public get imageUrl(): string {
-    return this._imageUrl;
-  }
-
-  public set imageUrl(value: string) {
-    this._imageUrl = value;
+  public get dto(): UserDto {
+    return {
+        firstName: this.firstName,
+        lastName: this.lastName,
+        alias: this.alias,
+        imageUrl: this.imageUrl
+    }
   }
 
   public equals(other: User): boolean {
     return this._alias === other._alias;
+  }
+
+  public get firstName(): string {
+    return this._firstName;
+  }
+
+  public set firstName(value: string) {
+    this._firstName = value;
+  }
+
+  public static fromDto(dto: UserDto | null): User | null {
+      return dto == null ? null : new User(dto.firstName, dto.lastName, dto.alias, dto.imageUrl)
   }
 
   public static fromJson(json: string | null | undefined): User | null {
@@ -73,6 +68,26 @@ export class User {
     } else {
       return null;
     }
+  }
+
+  public get imageUrl(): string {
+    return this._imageUrl;
+  }
+
+  public set imageUrl(value: string) {
+    this._imageUrl = value;
+  }
+
+  public get lastName(): string {
+    return this._lastName;
+  }
+
+  public set lastName(value: string) {
+    this._lastName = value;
+  }
+
+  public get name() {
+    return `${this.firstName} ${this.lastName}`;
   }
 
   public toJson(): string {
