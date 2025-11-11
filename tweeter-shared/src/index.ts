@@ -10,9 +10,11 @@ export { AuthToken } from "./model/domain/AuthToken";
 export { FakeData } from "./util/FakeData";
 
 // Requests
+export type { TweeterRequest } from "./model/net/request/TweeterRequest"
 export type { PagedUserItemRequest } from "./model/net/request/PagedUserItemRequest"
 
 // Responses
+export type { TweeterResponse } from "./model/net/response/TweeterResponse"
 export type { PagedUserItemResponse } from "./model/net/response/PagedUserItemResponse"
 
 // DTOs
