@@ -5,7 +5,7 @@ tweeterGetFollowees | handlers/follow/GetFolloweesLambda.handler
 tweeterGetFollowers | handlers/follow/GetFollowersLambda.handler
 tweeterGetFolloweeCount | handlers/follow/GetFolloweeCountLambda.handler
 tweeterGetFollowerCount | handlers/follow/GetFollowerCountLambda.handler
-tweeterFollowUser | handlers/follow/FollowUserLambda.handler
-tweeterUnfollowUser | handlers/follow/UnfollowUserLambda.handler
+tweeterFollowUser | handlers/user/FollowUserLambda.handler
+tweeterUnfollowUser | handlers/user/UnfollowUserLambda.handler
 '
 LAMBDALAYER_ARN='arn:aws:lambda:us-east-1:123398428865:layer:tweeterDependencies:4'
