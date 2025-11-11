@@ -1,8 +1,10 @@
-import { AuthToken, User, FakeData } from "tweeter-shared";
+import { AuthToken, User, FakeData, TweeterRequest } from "tweeter-shared";
 import { Service } from "./Service";
+import { ServerFacade } from "../network/ServerFacade";
 
 
 class UserService implements Service {
+    private server: ServerFacade = new ServerFacade();
 
     
     public async follow(authToken: AuthToken, userToFollow: User): Promise<[followerCount: number, followeeCount: number]>  {
@@ -18,13 +20,11 @@ class UserService implements Service {
     };
 
     public async getFolloweeCount (authToken: AuthToken, user: User): Promise<number> {
-        // TODO: Replace with the result of calling server
-        return FakeData.instance.getFolloweeCount(user.alias);
+        return this.server.getUserItemCount(this.createRequest(authToken, user), "followee");
     };
 
     public async getFollowerCount (authToken: AuthToken, user: User): Promise<number> {
-        // TODO: Replace with the result of calling server
-        return FakeData.instance.getFollowerCount(user.alias);
+        return this.server.getUserItemCount(this.createRequest(authToken, user), "follower");
     };
 
     public async getIsFollowerStatus(authToken: AuthToken, user: User, selectedUser: User): Promise<boolean> {
@@ -48,6 +48,13 @@ class UserService implements Service {
     
         return [followerCount, followeeCount];
     };
+
+    private createRequest(authToken: AuthToken, user: User): TweeterRequest {
+        return {
+            token: authToken.token, 
+            userAlias: user.alias
+        }
+    }
     
 }
 
