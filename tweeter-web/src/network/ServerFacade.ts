@@ -2,6 +2,7 @@ import {
   PagedUserItemRequest,
   PagedUserItemResponse,
   TweeterRequest,
+  UpdateFollowStatusResponse,
   User,
   UserItemCountResponse
 } from "tweeter-shared";
@@ -39,6 +40,22 @@ export class ServerFacade {
         if (response.success) {
             if (count == null) { throw new Error(`No ${itemType} count found`); } 
             else { return count; }
+        } else {
+            console.error(response);
+            throw new Error(response.message ?? undefined);
+        }
+    }
+
+    public async updateFollowStatus(request: TweeterRequest, status: string): Promise<[number, number]> {
+        const endpoint = "/user/" + status;
+        const response = await this.clientCommunicator.doPost<TweeterRequest, UpdateFollowStatusResponse>(request, endpoint);
+
+        const followerCount: number | null = response.success && response.followerCount ? response.followerCount : null;
+        const followeeCount: number | null = response.success && response.followeeCount ? response.followeeCount : null;
+  
+        if (response.success) {
+            if (followerCount == null || followeeCount == null) { throw new Error(`No ${request.userAlias} or its following counts found`); } 
+            else { return [followerCount, followeeCount]; }
         } else {
             console.error(response);
             throw new Error(response.message ?? undefined);

@@ -8,15 +8,7 @@ class UserService implements Service {
 
     
     public async follow(authToken: AuthToken, userToFollow: User): Promise<[followerCount: number, followeeCount: number]>  {
-        // Pause so we can see the follow message. Remove when connected to the server
-        await new Promise((f) => setTimeout(f, 2000));
-
-        // TODO: Call the server
-
-        const followerCount = await this.getFollowerCount(authToken, userToFollow);
-        const followeeCount = await this.getFolloweeCount(authToken, userToFollow);
-
-        return [followerCount, followeeCount];
+        return await this.server.updateFollowStatus(this.createRequest(authToken, userToFollow), "follow")
     };
 
     public async getFolloweeCount (authToken: AuthToken, user: User): Promise<number> {
@@ -38,15 +30,7 @@ class UserService implements Service {
     };
 
     public async unfollow(authToken: AuthToken, userToUnfollow: User): Promise<[followerCount: number, followeeCount: number]> {
-        // Pause so we can see the unfollow message. Remove when connected to the server
-        await new Promise((f) => setTimeout(f, 2000));
-    
-        // TODO: Call the server
-    
-        const followerCount = await this.getFollowerCount(authToken, userToUnfollow);
-        const followeeCount = await this.getFolloweeCount(authToken, userToUnfollow);
-    
-        return [followerCount, followeeCount];
+        return await this.server.updateFollowStatus(this.createRequest(authToken, userToUnfollow), "unfollow");
     };
 
     private createRequest(authToken: AuthToken, user: User): TweeterRequest {
