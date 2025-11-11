@@ -2,5 +2,6 @@ BUCKET='cs340-tweeter-backend'
 LAMBDA_ROLE='arn:aws:iam::123398428865:role/cs340-lambda'
 EDIT_LAMBDALIST='
 tweeterGetFollowees | handlers/follow/GetFolloweesLambda.handler
+tweeterGetFollowers | handlers/follow/GetFollowersLambda.handler
 '
-LAMBDALAYER_ARN='arn:aws:lambda:us-east-1:123398428865:layer:tweeterDependencies:3'
+LAMBDALAYER_ARN='arn:aws:lambda:us-east-1:123398428865:layer:tweeterDependencies:4'
