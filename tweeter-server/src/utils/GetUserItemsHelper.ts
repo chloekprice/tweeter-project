@@ -1,4 +1,4 @@
-import { PagedUserItemRequest, PagedUserItemResponse, UserDto } from "tweeter-shared";
+import { PagedUserItemRequest, PagedUserItemResponse } from "tweeter-shared";
 
 export const helper = async (request: PagedUserItemRequest, loadFunction: () => Promise<[any, any]>): Promise<PagedUserItemResponse> => {
     if (!request.token || !request.userAlias || !request.pageSize) {
