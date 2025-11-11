@@ -5,16 +5,9 @@ import { Service } from "./Service";
 class UserService implements Service {
 
     
-    public async follow(authToken: AuthToken, userToFollow: User): Promise<[followerCount: number, followeeCount: number]>  {
-        // Pause so we can see the follow message. Remove when connected to the server
-        await new Promise((f) => setTimeout(f, 2000));
-
-        // TODO: Call the server
-
-        const followerCount = await this.getFollowerCount(authToken.token, userToFollow.alias);
-        const followeeCount = await this.getFolloweeCount(authToken.token, userToFollow.alias);
-
-        return [followerCount, followeeCount];
+    public async follow(token: string, userToFollow: string): Promise<[followerCount: number, followeeCount: number]>  {
+       // TODO: follow the user
+        return this.updateFollowingCounts(token, userToFollow);
     };
 
     public async getFolloweeCount (token: string, userAlias: string): Promise<number> {
@@ -35,17 +28,18 @@ class UserService implements Service {
         return FakeData.instance.findUserByAlias(alias);
     };
 
-    public async unfollow(authToken: AuthToken, userToUnfollow: User): Promise<[followerCount: number, followeeCount: number]> {
-        // Pause so we can see the unfollow message. Remove when connected to the server
-        await new Promise((f) => setTimeout(f, 2000));
-    
-        // TODO: Call the server
-    
-        const followerCount = await this.getFollowerCount(authToken.token, userToUnfollow.alias);
-        const followeeCount = await this.getFolloweeCount(authToken.token, userToUnfollow.alias);
-    
-        return [followerCount, followeeCount];
+    public async unfollow(token: string, userToUnfollow: string): Promise<[followerCount: number, followeeCount: number]> {
+        // TODO: unfollow the user
+        return this.updateFollowingCounts(token, userToUnfollow);
     };
+
+
+    private async updateFollowingCounts(token: string, userToUpdate: string): Promise<[followerCount: number, followeeCount: number]> {
+        const followerCount = await this.getFollowerCount(token, userToUpdate);
+        const followeeCount = await this.getFolloweeCount(token, userToUpdate);
+
+        return [followerCount, followeeCount];
+    }
     
 }
 
