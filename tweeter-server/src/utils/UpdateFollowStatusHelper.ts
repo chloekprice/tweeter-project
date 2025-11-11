@@ -8,6 +8,9 @@ export const helper = async (request: TweeterRequest, updateFunction: (token: st
         throw new Error("Unauthorized: there are insufficient permissions to perform this action")
     }
 
+    // Remove once there is a call to follow/unfollow
+    await new Promise((f) => setTimeout(f, 2000));
+
     const [followerCount, followeeCount] = await updateFunction(request.token, request.userAlias);
 
     return {
