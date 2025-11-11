@@ -11,20 +11,18 @@ class UserService implements Service {
 
         // TODO: Call the server
 
-        const followerCount = await this.getFollowerCount(authToken, userToFollow);
-        const followeeCount = await this.getFolloweeCount(authToken, userToFollow);
+        const followerCount = await this.getFollowerCount(authToken.token, userToFollow.alias);
+        const followeeCount = await this.getFolloweeCount(authToken.token, userToFollow.alias);
 
         return [followerCount, followeeCount];
     };
 
-    public async getFolloweeCount (authToken: AuthToken, user: User): Promise<number> {
-        // TODO: Replace with the result of calling server
-        return FakeData.instance.getFolloweeCount(user.alias);
+    public async getFolloweeCount (token: string, userAlias: string): Promise<number> {
+        return FakeData.instance.getFolloweeCount(userAlias);
     };
 
-    public async getFollowerCount (authToken: AuthToken, user: User): Promise<number> {
-        // TODO: Replace with the result of calling server
-        return FakeData.instance.getFollowerCount(user.alias);
+    public async getFollowerCount (token: string, userAlias: string): Promise<number> {
+        return FakeData.instance.getFollowerCount(userAlias);
     };
 
     public async getIsFollowerStatus(authToken: AuthToken, user: User, selectedUser: User): Promise<boolean> {
@@ -43,8 +41,8 @@ class UserService implements Service {
     
         // TODO: Call the server
     
-        const followerCount = await this.getFollowerCount(authToken, userToUnfollow);
-        const followeeCount = await this.getFolloweeCount(authToken, userToUnfollow);
+        const followerCount = await this.getFollowerCount(authToken.token, userToUnfollow.alias);
+        const followeeCount = await this.getFolloweeCount(authToken.token, userToUnfollow.alias);
     
         return [followerCount, followeeCount];
     };

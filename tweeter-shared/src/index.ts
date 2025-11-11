@@ -16,6 +16,7 @@ export type { PagedUserItemRequest } from "./model/net/request/PagedUserItemRequ
 // Responses
 export type { TweeterResponse } from "./model/net/response/TweeterResponse"
 export type { PagedUserItemResponse } from "./model/net/response/PagedUserItemResponse"
+export type { UserItemCountResponse } from "./model/net/response/UserItemCountResponse"
 
 // DTOs
 export type { UserDto } from "./model/dto/UserDto"
