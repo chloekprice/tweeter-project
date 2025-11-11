@@ -1,12 +1,10 @@
 import { TweeterRequest, UpdateFollowStatusResponse } from "tweeter-shared";
+import { checkAuthorizationHelper } from "./CheckAuthorizationHelper";
+import { checkRequestHelper } from "./CheckRequestHelper";
 
 export const helper = async (request: TweeterRequest, updateFunction: (token: string, userAlias: string) => Promise<[number, number]> ): Promise<UpdateFollowStatusResponse> => {
-    if (!request.token || !request.userAlias) {
-        throw new Error("Bad Request: the request does not include all required parameters");
-    }
-    if (typeof request.token !== "string") {
-        throw new Error("Unauthorized: there are insufficient permissions to perform this action")
-    }
+    checkRequestHelper(request);
+    checkAuthorizationHelper(request);
 
     // Remove once there is a call to follow/unfollow
     await new Promise((f) => setTimeout(f, 2000));

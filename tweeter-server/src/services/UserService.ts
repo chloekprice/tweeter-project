@@ -1,4 +1,4 @@
-import { AuthToken, User, FakeData } from "tweeter-shared";
+import { AuthToken, User, FakeData, UserDto } from "tweeter-shared";
 import { Service } from "./Service";
 
 
@@ -18,14 +18,12 @@ class UserService implements Service {
         return FakeData.instance.getFollowerCount(userAlias);
     };
 
-    public async getIsFollowerStatus(authToken: AuthToken, user: User, selectedUser: User): Promise<boolean> {
-        // TODO: Replace with the result of calling server
+    public async getIsFollowerStatus(token: string, userAlias: string, selectedUserAlias: string): Promise<boolean> {
         return FakeData.instance.isFollower();
     };
 
-    public async getUser (authToken: AuthToken, alias: string): Promise<User | null>  {
-        // TODO: Replace with the result of calling server
-        return FakeData.instance.findUserByAlias(alias);
+    public async getUser (token: string, alias: string): Promise<UserDto | null>  {
+        return FakeData.instance.findUserByAlias(alias)? FakeData.instance.findUserByAlias(alias)!.dto : null;
     };
 
     public async unfollow(token: string, userToUnfollow: string): Promise<[followerCount: number, followeeCount: number]> {
