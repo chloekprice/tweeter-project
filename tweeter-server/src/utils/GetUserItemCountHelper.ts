@@ -1,6 +1,6 @@
 import { TweeterRequest, UserItemCountResponse } from "tweeter-shared";
 
-export const helper = async (request: TweeterRequest, getCountFunction: () => Promise<any>): Promise<UserItemCountResponse> => {
+export const helper = async (request: TweeterRequest, getCountFunction: (token: string, userAlias: string) => Promise<any>): Promise<UserItemCountResponse> => {
     if (!request.token || !request.userAlias) {
         throw new Error("Bad Request: the request does not include all required parameters");
     }
@@ -8,7 +8,7 @@ export const helper = async (request: TweeterRequest, getCountFunction: () => Pr
         throw new Error("Unauthorized: there are insufficient permissions to perform this action")
     }
 
-    const count = await getCountFunction();
+    const count = await getCountFunction(request.token, request.userAlias);
 
     return {
         success: true,
