@@ -24,3 +24,4 @@ export type { GetUserResponse } from "./model/net/response/GetUserResponse"
 
 // DTOs
 export type { UserDto } from "./model/dto/UserDto"
+export type { StatusDto } from "./model/dto/StatusDto"

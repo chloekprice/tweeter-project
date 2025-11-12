@@ -9,5 +9,7 @@ tweeterFollowUser | handlers/user/FollowUserLambda.handler
 tweeterUnfollowUser | handlers/user/UnfollowUserLambda.handler
 tweeterGetFollowStatus | handlers/user/GetFollowStatusLambda.handler
 tweeterGetUser | handlers/user/GetUserLambda.handler
+tweeterGetFeed | handlers/status/GetFeedLambda.handler
+tweeterGetStory | handlers/status/GetStoryLambda.handler
 '
 LAMBDALAYER_ARN='arn:aws:lambda:us-east-1:123398428865:layer:tweeterDependencies:4'
