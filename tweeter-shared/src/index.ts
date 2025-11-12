@@ -13,6 +13,7 @@ export { FakeData } from "./util/FakeData";
 export type { TweeterRequest } from "./model/net/request/TweeterRequest"
 export type { PagedItemRequest } from "./model/net/request/PagedItemRequest"
 export type { FollowerStatusRequest } from "./model/net/request/FollowerStatusRequest"
+export type { PostStatusRequest } from "./model/net/request/PostStatusRequest"
 
 // Responses
 export type { TweeterResponse } from "./model/net/response/TweeterResponse"
@@ -25,3 +26,4 @@ export type { GetUserResponse } from "./model/net/response/GetUserResponse"
 // DTOs
 export type { UserDto } from "./model/dto/UserDto"
 export type { StatusDto } from "./model/dto/StatusDto"
+export type { PostSegmentDto } from "./model/dto/PostSegmentDto"
