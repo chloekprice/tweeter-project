@@ -11,12 +11,12 @@ export { FakeData } from "./util/FakeData";
 
 // Requests
 export type { TweeterRequest } from "./model/net/request/TweeterRequest"
-export type { PagedUserItemRequest } from "./model/net/request/PagedUserItemRequest"
+export type { PagedItemRequest } from "./model/net/request/PagedItemRequest"
 export type { FollowerStatusRequest } from "./model/net/request/FollowerStatusRequest"
 
 // Responses
 export type { TweeterResponse } from "./model/net/response/TweeterResponse"
-export type { PagedUserItemResponse } from "./model/net/response/PagedUserItemResponse"
+export type { PagedItemResponse } from "./model/net/response/PagedItemResponse"
 export type { UserItemCountResponse } from "./model/net/response/UserItemCountResponse"
 export type { UpdateFollowStatusResponse } from "./model/net/response/UpdateFollowStatusResponse"
 export type { FollowerStatusResponse } from "./model/net/response/FollowerStatusResponse"
