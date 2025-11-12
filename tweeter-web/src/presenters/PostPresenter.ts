@@ -27,7 +27,7 @@ class PostPresenter extends BasePresenter<PostView> {
         
             const status = new Status(post, postUser, Date.now());
         
-            await this.postService.postStatus(authToken, status);
+            await this.postService.postStatus(authToken, postUser, status);
 
             this.view.setPost("");
         }, "post the status").then( () => {

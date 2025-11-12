@@ -36,9 +36,10 @@ describe("PostPresenter", () => {
     
         await postPresenterSpyInstance.submitPost(mockPost, mockUser, authToken);
 
-        let [calledAuthToken, calledStatus] = capture(mockService.postStatus).last();
+        let [calledAuthToken, calledUser, calledStatus] = capture(mockService.postStatus).last();
 
         expect(calledAuthToken).toEqual(authToken);
+        expect(calledUser).toEqual(mockUser);
         expect(calledStatus.post).toEqual(mockPost);
     })
 
@@ -58,7 +59,7 @@ describe("PostPresenter", () => {
         const mockPost = "dummy post"
         const mockUser = new User("fake", "user", "@fake", "image");
     
-        when(mockService.postStatus(authToken, anything())).thenThrow(error);
+        when(mockService.postStatus(authToken, anything(), anything())).thenThrow(error);
         await postPresenterSpyInstance.submitPost(mockPost, mockUser, authToken);
 
         verify(mockPostPresenterView.displayInfoMsg("Status posted!", anything())).never()

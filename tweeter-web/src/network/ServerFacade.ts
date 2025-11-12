@@ -4,9 +4,11 @@ import {
     GetUserResponse,
     PagedItemRequest,
     PagedItemResponse,
+    PostStatusRequest,
     Status,
     StatusDto,
     TweeterRequest,
+    TweeterResponse,
     UpdateFollowStatusResponse,
     User,
     UserDto,
@@ -85,6 +87,16 @@ export class ServerFacade {
             if (count == null) { throw new Error(`No ${itemType} count found`); } 
             else { return count; }
         } else {
+            console.error(response);
+            throw new Error(response.message ?? undefined);
+        }
+    }
+
+    public async postStatus(request: PostStatusRequest): Promise<void> {
+        const endpoint = "/status/post";
+        const response = await this.clientCommunicator.doPost<PostStatusRequest, TweeterResponse>(request, endpoint);
+  
+        if (!response.success) {
             console.error(response);
             throw new Error(response.message ?? undefined);
         }
