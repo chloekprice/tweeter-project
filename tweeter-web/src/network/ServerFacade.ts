@@ -2,8 +2,8 @@ import {
     FollowerStatusRequest,
   FollowerStatusResponse,
   GetUserResponse,
-  PagedUserItemRequest,
-  PagedUserItemResponse,
+  PagedItemRequest,
+  PagedItemResponse,
   TweeterRequest,
   UpdateFollowStatusResponse,
   User,
@@ -32,9 +32,9 @@ export class ServerFacade {
         }
     }
 
-    public async getMoreUserItems(request: PagedUserItemRequest, itemType: string): Promise<[User[], boolean]> {
+    public async getMoreUserItems(request: PagedItemRequest<UserDto>, itemType: string): Promise<[User[], boolean]> {
         const endpoint = "/" + itemType + "/list/load";
-        const response = await this.clientCommunicator.doPost<PagedUserItemRequest, PagedUserItemResponse>(request, endpoint);
+        const response = await this.clientCommunicator.doPost<PagedItemRequest<UserDto>, PagedItemResponse<UserDto>>(request, endpoint);
 
         const items: User[] | null =
         response.success && response.items
