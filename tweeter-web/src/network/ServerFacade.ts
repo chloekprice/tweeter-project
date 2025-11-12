@@ -1,16 +1,22 @@
 import {
     FollowerStatusRequest,
-  FollowerStatusResponse,
-  GetUserResponse,
-  PagedItemRequest,
-  PagedItemResponse,
-  TweeterRequest,
-  UpdateFollowStatusResponse,
-  User,
-  UserDto,
-  UserItemCountResponse
+    FollowerStatusResponse,
+    GetUserResponse,
+    PagedItemRequest,
+    PagedItemResponse,
+    Status,
+    StatusDto,
+    TweeterRequest,
+    UpdateFollowStatusResponse,
+    User,
+    UserDto,
+    UserItemCountResponse
 } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
+
+interface FromDto<T> {
+    fromDto(dto: unknown): T | null;
+}
 
 export class ServerFacade {
     private SERVER_URL = "https://qmwa3mswx8.execute-api.us-east-1.amazonaws.com/dev";
@@ -32,17 +38,21 @@ export class ServerFacade {
         }
     }
 
-    public async getMoreUserItems(request: PagedItemRequest<UserDto>, itemType: string): Promise<[User[], boolean]> {
-        const endpoint = "/" + itemType + "/list/load";
-        const response = await this.clientCommunicator.doPost<PagedItemRequest<UserDto>, PagedItemResponse<UserDto>>(request, endpoint);
+    public async getMoreItems<T extends UserDto | StatusDto, V extends User | Status>(
+        request: PagedItemRequest<T>, 
+        modelClass: FromDto<V>, 
+        endpoint: string
+    ): Promise<[V[], boolean]> {
 
-        const items: User[] | null =
+        const response = await this.clientCommunicator.doPost<PagedItemRequest<T>, PagedItemResponse<T>>(request, endpoint);
+
+        const items: V[] | null =
         response.success && response.items
-            ? response.items.map((dto) => User.fromDto(dto) as User)
+            ? response.items.map((dto) => modelClass.fromDto(dto) as V)
             : null;
   
         if (response.success) {
-            if (items == null) { throw new Error(`No ${itemType}s found`); } 
+            if (items == null) { throw new Error(`No item found`); } 
             else { return [items, response.hasMore]; }
         } else {
             console.error(response);
