@@ -22,19 +22,24 @@ class PostPresenter extends BasePresenter<PostView> {
         var postingStatusToastId = "";
     
         await this.performThrowingFunction( async () => {
-            this.view.setIsLoading(true);
-            postingStatusToastId = this.view.displayInfoMsg("Posting status...", 0);
-        
-            const status = new Status(post, postUser, Date.now());
-        
-            await this.postService.postStatus(authToken, postUser, status);
+            try {
+                this.view.setIsLoading(true);
+                postingStatusToastId = this.view.displayInfoMsg("Posting status...", 0);
+            
+                const status = new Status(post, postUser, Date.now());
+            
+                await this.postService.postStatus(authToken, postUser, status);
 
-            this.view.setPost("");
-        }, "post the status").then( () => {
-            this.view.deleteMsg(postingStatusToastId);
-            this.view.setIsLoading(false);
-            this.view.displayInfoMsg("Status posted!", 2000);
-        })
+                this.view.setPost("");
+                this.view.deleteMsg(postingStatusToastId);
+                this.view.setIsLoading(false);
+                this.view.displayInfoMsg("Status posted!", 2000);
+            } catch (error) {
+                this.view.deleteMsg(postingStatusToastId);
+                this.view.setIsLoading(false);
+                throw error;
+            }
+        }, "post the status")
     }
 }
 

@@ -59,7 +59,7 @@ describe("Login View", () => {
         expect(signInButton).toBeEnabled();
 
         await user.click(signInButton);
-        verify(mockPresenter.doAuth(deepEqual({ alias, password }), false)).once();
+        verify(mockPresenter.doAuth(deepEqual({ alias, password }), false, "/")).once();
 
     })
 })

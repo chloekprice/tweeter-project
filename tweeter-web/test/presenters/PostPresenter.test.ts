@@ -59,7 +59,7 @@ describe("PostPresenter", () => {
         const mockPost = "dummy post"
         const mockUser = new User("fake", "user", "@fake", "image");
     
-        when(mockService.postStatus(authToken, anything(), anything())).thenThrow(error);
+        when(mockService.postStatus(authToken, mockUser, anything())).thenThrow(error);
         await postPresenterSpyInstance.submitPost(mockPost, mockUser, authToken);
 
         verify(mockPostPresenterView.displayInfoMsg("Status posted!", anything())).never()
