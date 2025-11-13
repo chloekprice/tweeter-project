@@ -1,10 +1,14 @@
 import {
+    AuthenticationRequest,
+    AuthenticationResponse,
+    AuthToken,
     FollowerStatusRequest,
     FollowerStatusResponse,
     GetUserResponse,
     PagedItemRequest,
     PagedItemResponse,
     PostStatusRequest,
+    RegisterRequest,
     Status,
     StatusDto,
     TweeterRequest,
@@ -92,11 +96,57 @@ export class ServerFacade {
         }
     }
 
+    public async loginUser(request: AuthenticationRequest): Promise<[User, AuthToken]> {
+        const endpoint = "/auth/login"
+        const response = await this.clientCommunicator.doPost<AuthenticationRequest, AuthenticationResponse>(request, endpoint);
+
+        const user: User | null = response.success && response.user ? User.fromDto(response.user) : null;
+        const authToken: AuthToken | null = response.success && response.authToken ? AuthToken.fromDto(response.authToken) : null;
+  
+        if (response.success) {
+            if (user == null) { throw new Error(`No user returned for ${request.alias} found`); } 
+            else if (authToken == null) { throw new Error(`No auth token returned for ${request.alias} found`); }
+            else { return [user, authToken]; }
+        } else {
+            console.error(response);
+            throw new Error(response.message ?? undefined);
+        }
+    }
+
+    public async logoutUser(request: TweeterRequest): Promise<void> {
+        const endpoint = "/auth/logout"
+        const response = await this.clientCommunicator.doPost<TweeterRequest, TweeterResponse>(request, endpoint);
+  
+        if (response.success) {
+            return;
+        } else {
+            console.error(response);
+            throw new Error(response.message ?? undefined);
+        }
+    }
+
     public async postStatus(request: PostStatusRequest): Promise<void> {
         const endpoint = "/status/post";
         const response = await this.clientCommunicator.doPost<PostStatusRequest, TweeterResponse>(request, endpoint);
   
         if (!response.success) {
+            console.error(response);
+            throw new Error(response.message ?? undefined);
+        }
+    }
+
+    public async registerUser(request: RegisterRequest): Promise<[User, AuthToken]> {
+        const endpoint = "/auth/register"
+        const response = await this.clientCommunicator.doPost<RegisterRequest, AuthenticationResponse>(request, endpoint);
+
+        const user: User | null = response.success && response.user ? User.fromDto(response.user) : null;
+        const authToken: AuthToken | null = response.success && response.authToken ? AuthToken.fromDto(response.authToken) : null;
+  
+        if (response.success) {
+            if (user == null) { throw new Error(`No user returned for ${request.alias} found`); } 
+            else if (authToken == null) { throw new Error(`No auth token returned for ${request.alias} found`); }
+            else { return [user, authToken]; }
+        } else {
             console.error(response);
             throw new Error(response.message ?? undefined);
         }

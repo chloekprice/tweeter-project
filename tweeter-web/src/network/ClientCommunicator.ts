@@ -1,4 +1,4 @@
-import { TweeterRequest, TweeterResponse } from "tweeter-shared";
+import { AuthenticationRequest, AuthenticationResponse, TweeterRequest, TweeterResponse } from "tweeter-shared";
 
 export class ClientCommunicator {
   private SERVER_URL: string;
@@ -7,7 +7,7 @@ export class ClientCommunicator {
         this.SERVER_URL = SERVER_URL;
     }
 
-    public async doPost<REQ extends TweeterRequest, RES extends TweeterResponse>(req: REQ | undefined, endpoint: string, headers?: Headers): Promise<RES> {
+    public async doPost<REQ extends TweeterRequest | AuthenticationRequest, RES extends TweeterResponse | AuthenticationResponse>(req: REQ | undefined, endpoint: string, headers?: Headers): Promise<RES> {
         if (headers && req) {
             headers.append("Content-type", "application/json");
         } else if (req) {
