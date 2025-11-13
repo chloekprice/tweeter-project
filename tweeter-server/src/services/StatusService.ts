@@ -12,7 +12,7 @@ class StatusService implements Service {
         return this.getFakeData(lastItem, pageSize);
     };
 
-     private async getFakeData(lastStatus: StatusDto | null, pageSize: number): Promise<[StatusDto[], boolean]> {
+    private async getFakeData(lastStatus: StatusDto | null, pageSize: number): Promise<[StatusDto[], boolean]> {
         const [statuses, hasMore] = FakeData.instance.getPageOfStatuses(Status.fromDto(lastStatus), pageSize);
         const dtos = statuses.map((status) => status.dto);
         return [dtos, hasMore];
