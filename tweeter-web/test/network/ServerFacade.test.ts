@@ -11,10 +11,10 @@ describe('ServerFacade Integration Tests', () => {
 
     test('successfully registers a new user', async () => {
         const request = {
-            alias: "@test",
+            alias: "@allen",
             password: "password",
-            firstName: "Test",
-            lastName: "User",
+            firstName: "Allen",
+            lastName: "Anderson",
             imageUrl: "image"
         }
 
@@ -22,16 +22,20 @@ describe('ServerFacade Integration Tests', () => {
 
         expect(user).toBeDefined();
         expect(user).toBeInstanceOf(User);
+        expect(user.alias).toBe("@allen");
+        expect(user.firstName).toBe("Allen");
+        expect(user.lastName).toBe("Anderson");
+
         expect(token).toBeDefined();
         expect(token).toBeInstanceOf(AuthToken);
     })
 
     test('unsuccessfully registers a new user when missing a body parameter', async () => {
         const invalidRequest = {
-            alias: "@test",
+            alias: "@allen",
             password: "password",
-            firstName: "Test",
-            lastName: "User"
+            firstName: "Allen",
+            lastName: "Anderson"
         } as unknown as RegisterRequest;
 
         await expect(serverFacade.registerUser(invalidRequest)).rejects.toThrow(/Bad Request: the request does not include all required parameters/i);
@@ -51,6 +55,8 @@ describe('ServerFacade Integration Tests', () => {
         expect(followers).toBeDefined();
         expect(followers).toBeInstanceOf(Array);
         expect(followers[0]).toBeInstanceOf(User);
+        expect(followers[0].alias).toBe("@allen");
+
         expect(hasMore).toBeDefined();
         expect(typeof hasMore).toBe("boolean");
     })

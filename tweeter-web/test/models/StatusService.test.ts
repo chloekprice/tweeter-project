@@ -18,6 +18,7 @@ describe('StatusService Integration Tests', () => {
         expect(statuses).toBeDefined();
         expect(statuses).toBeInstanceOf(Array);
         expect(statuses[0]).toBeInstanceOf(Status);
+
         expect(hasMore).toBeDefined();
         expect(typeof hasMore).toBe("boolean");
     })
