@@ -24,7 +24,7 @@ class AuthenticationService {
           throw new Error("Invalid authentication");
         }
     
-        return [user, FakeData.instance.authToken];
+        return [user.dto, FakeData.instance.authToken.dto];
     }
 }
 
