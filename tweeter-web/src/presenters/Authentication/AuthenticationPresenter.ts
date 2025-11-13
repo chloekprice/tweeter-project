@@ -8,6 +8,7 @@ export interface AuthenticationView extends PresenterView {
     setRememberMe: (rememberMe: boolean) => void
     setIsLoading: (isLoading: boolean) => void
     update: (currentUser: User, displayedUser: User | null, authToken: AuthToken, remember: boolean) => void 
+    navigate: (url: string) => void
 }
 
 export interface AuthenticationInfo {
@@ -27,11 +28,19 @@ abstract class AuthenticationPresenter<V extends AuthenticationView, T extends A
     protected abstract authenticate(authInfo: T): Promise<[User, AuthToken]>
     protected abstract getAuthDescription(): string
 
-    public async doAuth(authInfo: T, rememberMe: boolean): Promise<void> {
+    public async doAuth(authInfo: T, rememberMe: boolean, originalUrl: string | undefined): Promise<void> {
         await this.performThrowingFunction( async() => {
             this.view.setIsLoading(true);
             const [user, authToken] = await this.authenticate(authInfo);
             this.view.update(user, user, authToken, rememberMe);
+
+            if (originalUrl == "/") {
+                this.view.navigate(`/feed/${user.alias}`);
+            } else if (!!originalUrl) {
+                this.view.navigate(originalUrl);
+            } else {
+                this.view.navigate(`/feed/${user.alias}`);
+            }
         }, this.getAuthDescription()).then( () => { this.view.setIsLoading(false); })
     }
 }

@@ -33,7 +33,8 @@ const Register = () => {
     update: update,
     setImageUrl: (imageUrl: string) => setImageUrl(imageUrl),
     setImageBytes: (imageBytes: Uint8Array) => setImageBytes(imageBytes),
-    setImageFileExtension: (imageFileExtension: string) => setImageFileExtension(imageFileExtension)
+    setImageFileExtension: (imageFileExtension: string) => setImageFileExtension(imageFileExtension),
+    navigate: navigate
   }
 
   const presenterRef = useRef<RegisterPresenter | null>(null)
@@ -62,8 +63,7 @@ const Register = () => {
   };
 
   const doRegister = async () => {
-      presenterRef.current!.doAuth( { firstName, lastName, alias, password, imageBytes, imageFileExtension }, rememberMe);
-      navigate(`/feed/${alias}`);
+      presenterRef.current!.doAuth( { firstName, lastName, alias, password, imageBytes, imageFileExtension }, rememberMe, "/");
   };
 
   

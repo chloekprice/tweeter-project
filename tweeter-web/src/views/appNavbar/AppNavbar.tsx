@@ -26,7 +26,7 @@ const AppNavbar = () => {
   if (!presenterRef.current) { presenterRef.current = new NavbarPresenter(observer); }
 
   const logOut = async () => {
-    await presenterRef.current!.logout(userInfo.authToken!);
+    await presenterRef.current!.logout(userInfo.authToken!, userInfo.currentUser!);
   };
 
 

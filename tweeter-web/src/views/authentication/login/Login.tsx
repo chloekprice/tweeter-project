@@ -30,6 +30,7 @@ const Login = (props: Props) => {
     setRememberMe: (rememberMe: boolean) => setRememberMe(rememberMe),
     setIsLoading: (isLoading: boolean) => setIsLoading(isLoading),
     update: update, 
+    navigate: navigate
   }
 
   const presenterRef = useRef<LoginPresenter | null>(null)
@@ -46,14 +47,7 @@ const Login = (props: Props) => {
   };
 
   const doLogin = async () => {
-      await presenterRef.current!.doAuth({ alias, password }, rememberMe);
-      if (props.originalUrl == "/") {
-          navigate(`/feed/${alias}`);
-      } else if (!!props.originalUrl) {
-          navigate(props.originalUrl);
-      } else {
-          navigate(`/feed/${alias}`);
-      }
+      await presenterRef.current!.doAuth({ alias, password }, rememberMe, props.originalUrl);
   };
 
   const inputFieldFactory = () => {
