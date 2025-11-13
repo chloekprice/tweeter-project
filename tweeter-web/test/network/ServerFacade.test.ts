@@ -5,6 +5,10 @@ import "isomorphic-fetch"
 describe('ServerFacade Integration Tests', () => {
     const serverFacade: ServerFacade = new ServerFacade();
 
+    jest.spyOn(console, 'log').mockImplementation(() => {});
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
+
     test('successfully registers a new user', async () => {
         const request = {
             alias: "@test",
@@ -46,6 +50,7 @@ describe('ServerFacade Integration Tests', () => {
 
         expect(followers).toBeDefined();
         expect(followers).toBeInstanceOf(Array);
+        expect(followers[0]).toBeInstanceOf(User);
         expect(hasMore).toBeDefined();
         expect(typeof hasMore).toBe("boolean");
     })
