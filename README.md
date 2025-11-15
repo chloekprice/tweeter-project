@@ -1,6 +1,6 @@
 # Tweeter-Web
 
-A starter project for the Tweeter Web application.
+Tweeter Web application created in conjunction with CS340 at Brigham Young University.
 
 ## Setting Up the Project
 

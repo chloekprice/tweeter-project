@@ -5,7 +5,7 @@ class PostService {
     private serverFacade: ServerFacade = new ServerFacade();
 
     public async postStatus(authToken: AuthToken, user: User, newStatus: Status): Promise<void> {
-        return this.serverFacade.postStatus({ token: authToken.token, userAlias: user.alias, status: newStatus});
+        return await this.serverFacade.postStatus({ token: authToken.token, userAlias: user.alias, status: newStatus});
     };
 }
 
