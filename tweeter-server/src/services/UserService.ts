@@ -2,14 +2,16 @@ import { FakeData, UserDto } from "tweeter-shared";
 import { Service } from "./Service";
 import { FollowsDao } from "../daos/follows/FollowsDao";
 import { DatabaseFactory } from "../daos/DatabaseFactory";
-import { Follow } from "../entities/Follow";
+import { UsersDao } from "../daos/users/UsersDao";
 
 
 class UserService implements Service {
     private followsProvider: FollowsDao;
+    private usersProvider: UsersDao;
 
     constructor(daoProvider: DatabaseFactory) {
         this.followsProvider = daoProvider.createFollowsDao();
+        this.usersProvider = daoProvider.createUsersDao();
     }
 
     
