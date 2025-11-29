@@ -6,13 +6,13 @@ import { UsersDao } from "../daos/users/UsersDao";
 
 
 class UserService implements Service {
-    private followsProvider: FollowsDao;
-    private usersProvider: UsersDao;
+    // private followsProvider: FollowsDao;
+    // private usersProvider: UsersDao;
 
-    constructor(daoProvider: DatabaseFactory) {
-        this.followsProvider = daoProvider.createFollowsDao();
-        this.usersProvider = daoProvider.createUsersDao();
-    }
+    // constructor(daoProvider: DatabaseFactory) {
+    //     this.followsProvider = daoProvider.createFollowsDao();
+    //     this.usersProvider = daoProvider.createUsersDao();
+    // }
 
     
     public async follow(token: string, userToFollow: string): Promise<[followerCount: number, followeeCount: number]>  {
