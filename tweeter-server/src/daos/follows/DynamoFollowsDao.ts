@@ -12,33 +12,55 @@ import { FollowsDao } from "./FollowsDao";
 import { Follow } from "../../entities/Follow";
 
 
+interface FollowParams {
+    KeyConditionExpression: string;
+    ExpressionAttributeValues: { [key: string]: string };
+    TableName: string;
+    IndexName?: string;
+    Limit: number;
+    ExclusiveStartKey?: { [key: string]: string };
+}
+
+
 export class DynamoFollowsDao implements FollowsDao {
     readonly tableName = "follows";
     readonly indexName = "followee_handle-follower_handle-index";
     readonly followeeHandleAttr = "followee_handle";
     readonly followerHandleAttr = "follower_handle";
-    readonly followeeNameAttr = "followee_name";
-    readonly followerNameAttr = "follower_name";
+    readonly followeeFirstNameAttr = "followee_first_name";
+    readonly followerFirstNameAttr = "follower_first_name";
+    readonly followeeLastNameAttr = "followee_last_name";
+    readonly followeeImageUrlAttr = "followee_image_url";
+    readonly followerLastNameAttr = "follower_last_name";
+    readonly followerImageUrlAttr = "follower_image_url";
 
     private readonly client = DynamoDBDocumentClient.from(new DynamoDBClient());
 
+
     async addFollow(follow: Follow): Promise<void> {
         const followInDatabase: Follow | undefined = await this.getFollow(follow);
+
         if (followInDatabase !== undefined) {
-            if (follow.followeeName == followInDatabase.followeeName) {
-                await this.updateFollower(follow);
-            } else {
-                await this.updateFollowee(follow);
+            if (
+                follow.followeeFirstName != followInDatabase.followeeFirstName ||
+                follow.followeeLastName != followInDatabase.followeeLastName
+            ) { 
+                await this.updateFollowee(follow); 
+            } else if (
+                follow.followerFirstName != followInDatabase.followerFirstName ||
+                follow.followerLastName != followInDatabase.followerLastName
+            ) { 
+                await this.updateFollower(follow); 
             }
-            } else {
+        } else {
             await this.putFollow(follow);
         }
     }
 
     async deleteFollow(follow: Follow): Promise<void> {
         const params = {
-        TableName: this.tableName,
-        Key: this.generateFollowItem(follow),
+            TableName: this.tableName,
+            Key: this.generateFollowItem(follow),
         };
         await this.client.send(new DeleteCommand(params));
     }
@@ -48,119 +70,124 @@ export class DynamoFollowsDao implements FollowsDao {
             TableName: this.tableName,
             Key: this.generateFollowItem(follow),
         };
+
         const output = await this.client.send(new GetCommand(params));
+
         return output.Item == undefined
         ? undefined
         : new Follow(
-            output.Item[this.followeeNameAttr],
-            output.Item[this.followerNameAttr],
             output.Item[this.followeeHandleAttr],
-            output.Item[this.followerHandleAttr]
-            );
+            output.Item[this.followeeFirstNameAttr],
+            output.Item[this.followeeLastNameAttr],
+            output.Item[this.followeeImageUrlAttr],
+            output.Item[this.followerHandleAttr],
+            output.Item[this.followerFirstNameAttr],
+            output.Item[this.followerLastNameAttr],
+            output.Item[this.followerImageUrlAttr]
+        );
     }
 
     async getPageOfFollowees(followerHandle: string, pageSize: number, lastFolloweeHandle: string | undefined): Promise<DataPage<Follow>> {
         const params = {
-            KeyConditionExpression: this.followeeHandleAttr + " = :follower",
+            KeyConditionExpression: `${this.followerHandleAttr} = :follower`,
             ExpressionAttributeValues: {
                 ":follower": followerHandle,
             },
-            TableName: this.tableName,
-            IndexName: this.indexName,
+            TableName: this.tableName, // PRIMARY TABLE
             Limit: pageSize,
             ExclusiveStartKey: 
                 lastFolloweeHandle === undefined 
                 ? undefined : {
-                    [this.followerHandleAttr]: followerHandle,
-                    [this.followeeHandleAttr]: lastFolloweeHandle
+                    [this.followerHandleAttr]: followerHandle, // PARTITION
+                    [this.followeeHandleAttr]: lastFolloweeHandle // SORT
                 },
         };
 
-        const items: Follow[] = [];
-        const data = await this.client.send(new QueryCommand(params));
-        const hasMorePages = data.LastEvaluatedKey !== undefined;
-        data.Items?.forEach( (item) =>
-        items.push(new Follow(
-            item[this.followeeNameAttr],
-            item[this.followerNameAttr],
-            item[this.followeeHandleAttr],
-            item[this.followerHandleAttr]
-        ))
-        )
-
-        return new DataPage<Follow>(items, hasMorePages);
+        return this.getPageOfUsers(params);
     }
 
     async getPageOfFollowers(followeeHandle: string, pageSize: number, lastFollowerHandle: string | undefined): Promise<DataPage<Follow>> {
         const params = {
-            KeyConditionExpression: this.followeeHandleAttr + " = :followee",
+            KeyConditionExpression: `${this.followeeHandleAttr} = :followee`,
             ExpressionAttributeValues: {
                 ":followee": followeeHandle,
             },
             TableName: this.tableName,
-            IndexName: this.indexName,
+            IndexName: this.indexName, // GSI
             Limit: pageSize,
             ExclusiveStartKey: 
                 lastFollowerHandle === undefined 
                 ? undefined : {
-                    [this.followerHandleAttr]: lastFollowerHandle,
-                    [this.followeeHandleAttr]: followeeHandle
+                    [this.followeeHandleAttr]: followeeHandle, // PARTITION IN GSI
+                    [this.followerHandleAttr]: lastFollowerHandle // SORT IN GSI
                 },
         };
 
+       return this.getPageOfUsers(params);
+    }
+
+
+
+    private generateFollowItem(follow: Follow) {
+        return {
+            [this.followerHandleAttr]: follow.followerHandle,
+            [this.followeeHandleAttr]: follow.followeeHandle
+        };
+    }
+
+    private async getPageOfUsers(parameters: FollowParams): Promise<DataPage<Follow>> {
         const items: Follow[] = [];
-        const data = await this.client.send(new QueryCommand(params));
-        const hasMorePages = data.LastEvaluatedKey !== undefined;
+        const data = await this.client.send(new QueryCommand(parameters));
+
         data.Items?.forEach( (item) =>
-        items.push(new Follow(
-            item[this.followeeNameAttr],
-            item[this.followerNameAttr],
-            item[this.followeeHandleAttr],
-            item[this.followerHandleAttr]
-        ))
+            items.push(new Follow(
+                item[this.followeeHandleAttr] ?? "",
+                item[this.followeeFirstNameAttr] ?? "",
+                item[this.followeeLastNameAttr] ?? "",
+                item[this.followeeImageUrlAttr] ?? "",
+                item[this.followerHandleAttr] ?? "",
+                item[this.followerFirstNameAttr] ?? "",
+                item[this.followerLastNameAttr] ?? "",
+                item[this.followerImageUrlAttr] ?? ""
+            ))
         )
+
+        const hasMorePages = data.LastEvaluatedKey !== undefined;
 
         return new DataPage<Follow>(items, hasMorePages);
     }
-
 
     private async putFollow(follow: Follow): Promise<void> {
         const params = {
             TableName: this.tableName,
             Item: {
-                [this.followeeNameAttr]: follow.followeeName,
-                [this.followerNameAttr]: follow.followerName, 
                 [this.followeeHandleAttr]: follow.followeeHandle,
+                [this.followeeFirstNameAttr]: follow.followeeFirstName,
+                [this.followeeLastNameAttr]: follow.followeeLastName,
+                [this.followeeImageUrlAttr]: follow.followeeImageUrl,
                 [this.followerHandleAttr]: follow.followerHandle,
+                [this.followerFirstNameAttr]: follow.followerFirstName,
+                [this.followerLastNameAttr]: follow.followerLastName,
+                [this.followerImageUrlAttr]: follow.followerImageUrl
             },
         };
         await this.client.send(new PutCommand(params));
     }
 
-
-    private generateFollowItem(follow: Follow) {
-        return {
-            [this.followeeHandleAttr]: follow.followeeHandle,
-            [this.followerHandleAttr]: follow.followerHandle,
-        };
-    }
-
     private async updateFollowee(follow: Follow): Promise<void> {
-        const params = {
-            TableName: this.tableName,
-            Key: this.generateFollowItem(follow),
-            ExpressionAttributeValues: { ":val": follow.followeeName },
-            UpdateExpression: `SET ${this.followeeNameAttr} = :val`,
-        };
-        await this.client.send(new UpdateCommand(params));
+        await this.updateUser(follow, this.followeeFirstNameAttr, follow.followeeFirstName, this.followeeLastNameAttr, follow.followeeLastName);
     }
 
     private async updateFollower(follow: Follow): Promise<void> {
+        await this.updateUser(follow, this.followerFirstNameAttr, follow.followerFirstName, this.followerLastNameAttr, follow.followerLastName);
+    }
+
+    private async updateUser(follow: Follow, firstNameAttr: string, updatedFirstName: string, lastNameAttr: string, updatedLastName: string): Promise<void> {
         const params = {
             TableName: this.tableName,
             Key: this.generateFollowItem(follow),
-            ExpressionAttributeValues: { ":val": follow.followerName },
-            UpdateExpression: `SET ${this.followerNameAttr} = :val`,
+            ExpressionAttributeValues: { ":val1": updatedFirstName, ":val2": updatedLastName },
+            UpdateExpression: `SET ${firstNameAttr} = :val1, ${lastNameAttr} = :val2`,
         };
         await this.client.send(new UpdateCommand(params));
     }
