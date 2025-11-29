@@ -1,8 +1,16 @@
 import { FakeData, UserDto } from "tweeter-shared";
 import { Service } from "./Service";
+import { FollowsDao } from "../daos/follows/FollowsDao";
+import { DatabaseFactory } from "../daos/DatabaseFactory";
+import { Follow } from "../entities/Follow";
 
 
 class UserService implements Service {
+    private followsProvider: FollowsDao;
+
+    constructor(daoProvider: DatabaseFactory) {
+        this.followsProvider = daoProvider.createFollowsDao();
+    }
 
     
     public async follow(token: string, userToFollow: string): Promise<[followerCount: number, followeeCount: number]>  {
