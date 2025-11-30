@@ -1,7 +1,7 @@
 
 export class Segment {
     text: string;
-    startPostion: number;
+    startPosition: number;
     endPosition: number;
     type: string;
 
@@ -12,7 +12,7 @@ export class Segment {
         type: string
     ) {
         this.text = text;
-        this.startPostion = startPosition;
+        this.startPosition = startPosition;
         this.endPosition = endPosition;
         this.type = type;
     }

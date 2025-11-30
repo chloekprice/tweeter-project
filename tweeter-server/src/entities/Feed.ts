@@ -1,7 +1,7 @@
 import { Status } from "./Status";
 
 export class Feed {
-    user_alias: string; // PK
+    userAlias: string; // PK
     timestamp: number; // SK
     statuses: Status[]; 
 
@@ -10,7 +10,7 @@ export class Feed {
         timestamp: number,
         statuses: Status[]
     ) {
-        this.user_alias = user_alias;
+        this.userAlias = user_alias;
         this.timestamp = timestamp;
         this.statuses = statuses;
     }
