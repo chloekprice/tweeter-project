@@ -44,7 +44,7 @@ export class DynamoUsersDao implements UsersDao {
         await this.client.send(new DeleteCommand(deleteParamas));
     }
 
-    async getUser(alias: string): Promise<User | undefined> {
+    async getUser(alias: string): Promise<User | null> {
         const params = {
             TableName: this.tableName,
             Key: this.generateUserItem(alias),
@@ -53,7 +53,7 @@ export class DynamoUsersDao implements UsersDao {
         const output = await this.client.send(new GetCommand(params));
 
         return output.Item == undefined
-        ? undefined
+        ? null
         : new User(
             output.Item[this.aliasAttr],
             output.Item[this.firstNameAttr],

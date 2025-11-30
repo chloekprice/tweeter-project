@@ -72,7 +72,7 @@ export class ServerFacade {
 
         const response = await this.callBackend<TweeterRequest, UserItemCountResponse>(request, endpoint);
         
-        const count: number | null = response.count ? response.count : null;
+        const count: number | null = response.count;
         if (count == null) { throw new Error(`No ${itemType} count found`); } 
         else { return count; }
     }

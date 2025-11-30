@@ -24,10 +24,9 @@ class AuthenticationService {
     }
 
     public async login(alias: string, password: string): Promise<[UserDto, AuthTokenDto]>  {
-        console.log("getting user");
         const user = await this.usersProvider.getUser(alias);
 
-        if (typeof user === "undefined") {
+        if (user == null) {
             throw new Error(`Unauthorized Request: No user with alias ${alias} exists`)
         }
         
@@ -42,6 +41,8 @@ class AuthenticationService {
     }
 
     public async register(firstName: string, lastName: string, alias: string, password: string, profileImage: string): Promise<[UserDto, AuthTokenDto]> {
+        // TO-DO: save image in s3
+        
         const hashedPassword = await bcrypt.hash(password, this.SALT_ROUNDS);
         const newUser = new User(alias, firstName, lastName, hashedPassword, profileImage);
         await this.usersProvider.addUser(newUser);

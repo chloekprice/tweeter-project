@@ -4,6 +4,7 @@ import {
   GetCommand,
   PutCommand,
   QueryCommand,
+  QueryCommandInput,
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
@@ -85,6 +86,33 @@ export class DynamoFollowsDao implements FollowsDao {
             output.Item[this.followerLastNameAttr],
             output.Item[this.followerImageUrlAttr]
         );
+    }
+
+    async getFolloweeCount(alias: string): Promise<number> {
+        const params: QueryCommandInput = {
+            TableName: this.tableName, // PRIMARY TABLE
+            KeyConditionExpression: `${this.followerHandleAttr} = :alias`,
+            ExpressionAttributeValues: { ":alias": alias },
+            Select: "COUNT",
+        };
+
+        const result = await this.client.send(new QueryCommand(params));
+
+        return result.Count ?? 0;
+    }
+
+    async getFollowerCount(alias: string): Promise<number> {
+        const params: QueryCommandInput = {
+            TableName: this.tableName,
+            IndexName: this.indexName, // GSI
+            KeyConditionExpression: `${this.followeeHandleAttr} = :alias`,
+            ExpressionAttributeValues: { ":alias": alias },
+            Select: "COUNT",
+        };
+
+        const result = await this.client.send(new QueryCommand(params));
+
+        return result.Count ?? 0;
     }
 
     async getPageOfFollowees(followerHandle: string, pageSize: number, lastFolloweeHandle: string | undefined): Promise<DataPage<Follow>> {
