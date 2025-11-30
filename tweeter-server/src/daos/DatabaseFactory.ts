@@ -1,6 +1,7 @@
 import { FollowsDao } from "./follows/FollowsDao";
-import { UsersDao } from "./users/UsersDao";
+import { SessionsDao } from "./sessions/SessionsDao";
 
 export interface DatabaseFactory {
     createFollowsDao(): FollowsDao
+    createSessionsDao(): SessionsDao
 }

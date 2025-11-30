@@ -12,8 +12,9 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "tweeter-shared": "file:../tweeter-shared",
+    "@types/bcryptjs": "^2.4.6",
     "date-fns": "^3.3.1",
+    "tweeter-shared": "file:../tweeter-shared",
     "uuid": "^9.0.1"
   }
 }
