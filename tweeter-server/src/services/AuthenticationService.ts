@@ -4,7 +4,7 @@ import { DatabaseFactory } from "../daos/DatabaseFactory";
 import { Session } from "../entities/Session";
 import { UsersDao } from "../daos/users/UsersDao";
 import { User } from "../entities/User";
-import bcyrypt from "bcryptjs";
+import bcrypt from "bcryptjs";
 
 
 class AuthenticationService {
@@ -24,15 +24,15 @@ class AuthenticationService {
     }
 
     public async login(alias: string, password: string): Promise<[UserDto, AuthTokenDto]>  {
-        const hashedPassword = await bcyrypt.hash(password, this.SALT_ROUNDS);
+        console.log("getting user");
         const user = await this.usersProvider.getUser(alias);
 
         if (typeof user === "undefined") {
             throw new Error(`Unauthorized Request: No user with alias ${alias} exists`)
         }
         
-        if (user?.passwordHash != hashedPassword) {
-            throw new Error("Unauthorized Request: Incorrect password was entered.");
+        if (!await bcrypt.compare(password, user.passwordHash)) {
+            throw new Error(`Unauthorized Request: Incorrect password was entered.`);
         }
 
         const userDto = this.getUserDtoFromUser(user);
@@ -42,7 +42,7 @@ class AuthenticationService {
     }
 
     public async register(firstName: string, lastName: string, alias: string, password: string, profileImage: string): Promise<[UserDto, AuthTokenDto]> {
-        const hashedPassword = await bcyrypt.hash(password, this.SALT_ROUNDS);
+        const hashedPassword = await bcrypt.hash(password, this.SALT_ROUNDS);
         const newUser = new User(alias, firstName, lastName, hashedPassword, profileImage);
         await this.usersProvider.addUser(newUser);
 
