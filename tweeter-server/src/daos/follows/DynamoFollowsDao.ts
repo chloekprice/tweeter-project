@@ -24,7 +24,7 @@ interface FollowParams {
 
 export class DynamoFollowsDao implements FollowsDao {
     readonly tableName = "follows";
-    readonly indexName = "followee_handle-follower_handle-index";
+    readonly indexName = "follow-gs-index";
     readonly followeeHandleAttr = "followee_handle";
     readonly followerHandleAttr = "follower_handle";
     readonly followeeFirstNameAttr = "followee_first_name";
