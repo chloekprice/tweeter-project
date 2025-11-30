@@ -1,32 +1,55 @@
-import { FakeData, AuthTokenDto, UserDto } from "tweeter-shared";
+import { AuthTokenDto, UserDto } from "tweeter-shared";
 import { SessionsDao } from "../daos/sessions/SessionsDao";
 import { DatabaseFactory } from "../daos/DatabaseFactory";
 import { Session } from "../entities/Session";
+import { UsersDao } from "../daos/users/UsersDao";
+import { User } from "../entities/User";
+import bcyrypt from "bcryptjs";
 
 
 class AuthenticationService {
     private sessionProvider: SessionsDao;
+    private usersProvider: UsersDao;
     
     constructor(daoProvider: DatabaseFactory) {
         this.sessionProvider = daoProvider.createSessionsDao();
+        this.usersProvider = daoProvider.createUsersDao();
     }
     
     TIME_TO_LIVE: number = 1800000 // 30 minutes
+    SALT_ROUNDS: number = 10
 
     public async logUserOut(token: string, userAlias: string): Promise<void> {
         await this.sessionProvider.deleteSession(token, userAlias);
     }
 
     public async login(alias: string, password: string): Promise<[UserDto, AuthTokenDto]>  {
-        const authToken = await this.authenticateUser(alias);
+        const hashedPassword = await bcyrypt.hash(password, this.SALT_ROUNDS);
+        const user = await this.usersProvider.getUser(alias);
+
+        if (typeof user === "undefined") {
+            throw new Error(`Unauthorized Request: No user with alias ${alias} exists`)
+        }
         
-        return this.getFakeData();
+        if (user?.passwordHash != hashedPassword) {
+            throw new Error("Unauthorized Request: Incorrect password was entered.");
+        }
+
+        const userDto = this.getUserDtoFromUser(user);
+        const authTokenDto = await this.authenticateUser(alias);
+        
+        return [userDto, authTokenDto];
     }
 
     public async register(firstName: string, lastName: string, alias: string, password: string, profileImage: string): Promise<[UserDto, AuthTokenDto]> {
-        const authToken = await this.authenticateUser(alias);
+        const hashedPassword = await bcyrypt.hash(password, this.SALT_ROUNDS);
+        const newUser = new User(alias, firstName, lastName, hashedPassword, profileImage);
+        await this.usersProvider.addUser(newUser);
 
-        return this.getFakeData();
+        const userDto = this.getUserDtoFromUser(newUser);
+        const authTokenDto = await this.authenticateUser(alias);
+        
+        return [userDto, authTokenDto];
     }
 
 
@@ -46,15 +69,15 @@ class AuthenticationService {
         }
     }
 
-    private async getFakeData(): Promise<[UserDto, AuthTokenDto]> {
-        const user = FakeData.instance.firstUser;
-    
-        if (user === null) {
-          throw new Error("Invalid authentication");
+    private getUserDtoFromUser(user: User): UserDto {
+        return {
+            firstName: user.firstName,
+            lastName: user.lastName,
+            alias: user.alias,
+            imageUrl: user.imageUrl
         }
-    
-        return [user.dto, FakeData.instance.authToken.dto];
     }
+
 }
 
 export default AuthenticationService;

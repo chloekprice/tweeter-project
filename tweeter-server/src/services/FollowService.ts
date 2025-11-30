@@ -52,7 +52,7 @@ class FollowService implements Service {
     }
 
     private async loadMoreUsersFromDatabase(token: string, getPageOfUsers: () => Promise<DataPage<Follow>>, getUsersFromPage: (page: DataPage<Follow>) => UserDto[]): Promise<[UserDto[], boolean]>  {
-        // check authorization
+        // TO-DO: check authorization
         const page = await getPageOfUsers();
         const usersList = getUsersFromPage(page);
         return [ usersList, page.hasMorePages]

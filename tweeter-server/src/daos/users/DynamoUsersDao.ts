@@ -1,167 +1,73 @@
-// import {
-//   DeleteCommand,
-//   DynamoDBDocumentClient,
-//   GetCommand,
-//   PutCommand,
-//   QueryCommand,
-//   UpdateCommand,
-// } from "@aws-sdk/lib-dynamodb";
-// import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-// import { DataPage } from "../../entities/DataPage";
-// import { Follow } from "../../entities/Follow";
-// import { UsersDao } from "./UsersDao";
+import {
+  DeleteCommand,
+  DynamoDBDocumentClient,
+  GetCommand,
+  PutCommand
+} from "@aws-sdk/lib-dynamodb";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { User } from "../../entities/User";
+import { UsersDao } from "./UsersDao";
 
 
-// export class DynamoUsersDao implements UsersDao {
-//     readonly tableName = "follows";
-//     readonly indexName = "followee_handle-follower_handle-index";
-//     readonly followeeHandleAttr = "followee_handle";
-//     readonly followerHandleAttr = "follower_handle";
-//     readonly followeeNameAttr = "followee_name";
-//     readonly followerNameAttr = "follower_name";
+export class DynamoUsersDao implements UsersDao {
+    readonly tableName = "users";
+    readonly indexName = "users-gs-index";
+    readonly aliasAttr = "alias";
+    readonly firstNameAttr = "first_name";
+    readonly lastNameAttr = "last_name";
+    readonly passwordHashAttr = "password_hash";
+    readonly imageUrlAttr = "image_url";
 
-//     private readonly client = DynamoDBDocumentClient.from(new DynamoDBClient());
+    private readonly client = DynamoDBDocumentClient.from(new DynamoDBClient());
+    
+    async addUser(user: User): Promise<void> {
+        const params = {
+            TableName: this.tableName,
+            Item: {
+                [this.aliasAttr]: user.alias,
+                [this.firstNameAttr]: user.firstName,
+                [this.lastNameAttr]: user.lastName,
+                [this.passwordHashAttr]: user.passwordHash,
+                [this.imageUrlAttr]: user.imageUrl
+            },
+        };
 
-//     async addFollow(follow: Follow): Promise<void> {
-//         const followInDatabase: Follow | undefined = await this.getFollow(follow);
-//         if (followInDatabase !== undefined) {
-//             if (follow.followeeName == followInDatabase.followeeName) {
-//                 await this.updateFollower(follow);
-//             } else {
-//                 await this.updateFollowee(follow);
-//             }
-//             } else {
-//             await this.putFollow(follow);
-//         }
-//     }
+        await this.client.send(new PutCommand(params));
+    }
 
-//     async deleteFollow(follow: Follow): Promise<void> {
-//         const params = {
-//         TableName: this.tableName,
-//         Key: this.generateFollowItem(follow),
-//         };
-//         await this.client.send(new DeleteCommand(params));
-//     }
+    async deleteUser(alias: string): Promise<void> {
+        const deleteParamas = {
+            TableName: this.tableName,
+            Key: this.generateUserItem(alias),
+        };
 
-//     async getFollow(follow: Follow): Promise<Follow | undefined> {
-//         const params = {
-//             TableName: this.tableName,
-//             Key: this.generateFollowItem(follow),
-//         };
-//         const output = await this.client.send(new GetCommand(params));
-//         return output.Item == undefined
-//         ? undefined
-//         : new Follow(
-//             output.Item[this.followeeNameAttr],
-//             output.Item[this.followerNameAttr],
-//             output.Item[this.followeeHandleAttr],
-//             output.Item[this.followerHandleAttr]
-//             );
-//     }
+        await this.client.send(new DeleteCommand(deleteParamas));
+    }
 
-//     async getPageOfFollowees(followerHandle: string, pageSize: number, lastFolloweeHandle: string | undefined): Promise<DataPage<Follow>> {
-//         const params = {
-//             KeyConditionExpression: this.followeeHandleAttr + " = :follower",
-//             ExpressionAttributeValues: {
-//                 ":follower": followerHandle,
-//             },
-//             TableName: this.tableName,
-//             IndexName: this.indexName,
-//             Limit: pageSize,
-//             ExclusiveStartKey: 
-//                 lastFolloweeHandle === undefined 
-//                 ? undefined : {
-//                     [this.followerHandleAttr]: followerHandle,
-//                     [this.followeeHandleAttr]: lastFolloweeHandle
-//                 },
-//         };
+    async getUser(alias: string): Promise<User | undefined> {
+        const params = {
+            TableName: this.tableName,
+            Key: this.generateUserItem(alias),
+        };
 
-//         const items: Follow[] = [];
-//         const data = await this.client.send(new QueryCommand(params));
-//         const hasMorePages = data.LastEvaluatedKey !== undefined;
-//         data.Items?.forEach( (item) =>
-//         items.push(new Follow(
-//             item[this.followeeNameAttr],
-//             item[this.followerNameAttr],
-//             item[this.followeeHandleAttr],
-//             item[this.followerHandleAttr]
-//         ))
-//         )
+        const output = await this.client.send(new GetCommand(params));
 
-//         return new DataPage<Follow>(items, hasMorePages);
-//     }
-
-//     async getPageOfFollowers(followeeHandle: string, pageSize: number, lastFollowerHandle: string | undefined): Promise<DataPage<Follow>> {
-//         const params = {
-//             KeyConditionExpression: this.followeeHandleAttr + " = :followee",
-//             ExpressionAttributeValues: {
-//                 ":followee": followeeHandle,
-//             },
-//             TableName: this.tableName,
-//             IndexName: this.indexName,
-//             Limit: pageSize,
-//             ExclusiveStartKey: 
-//                 lastFollowerHandle === undefined 
-//                 ? undefined : {
-//                     [this.followerHandleAttr]: lastFollowerHandle,
-//                     [this.followeeHandleAttr]: followeeHandle
-//                 },
-//         };
-
-//         const items: Follow[] = [];
-//         const data = await this.client.send(new QueryCommand(params));
-//         const hasMorePages = data.LastEvaluatedKey !== undefined;
-//         data.Items?.forEach( (item) =>
-//         items.push(new Follow(
-//             item[this.followeeNameAttr],
-//             item[this.followerNameAttr],
-//             item[this.followeeHandleAttr],
-//             item[this.followerHandleAttr]
-//         ))
-//         )
-
-//         return new DataPage<Follow>(items, hasMorePages);
-//     }
+        return output.Item == undefined
+        ? undefined
+        : new User(
+            output.Item[this.aliasAttr],
+            output.Item[this.firstNameAttr],
+            output.Item[this.lastNameAttr],
+            output.Item[this.passwordHashAttr],
+            output.Item[this.imageUrlAttr]
+        );
+    }
 
 
-//     private async putFollow(follow: Follow): Promise<void> {
-//         const params = {
-//             TableName: this.tableName,
-//             Item: {
-//                 [this.followeeNameAttr]: follow.followeeName,
-//                 [this.followerNameAttr]: follow.followerName, 
-//                 [this.followeeHandleAttr]: follow.followeeHandle,
-//                 [this.followerHandleAttr]: follow.followerHandle,
-//             },
-//         };
-//         await this.client.send(new PutCommand(params));
-//     }
-
-
-//     private generateFollowItem(follow: Follow) {
-//         return {
-//             [this.followeeHandleAttr]: follow.followeeHandle,
-//             [this.followerHandleAttr]: follow.followerHandle,
-//         };
-//     }
-
-//     private async updateFollowee(follow: Follow): Promise<void> {
-//         const params = {
-//             TableName: this.tableName,
-//             Key: this.generateFollowItem(follow),
-//             ExpressionAttributeValues: { ":val": follow.followeeName },
-//             UpdateExpression: `SET ${this.followeeNameAttr} = :val`,
-//         };
-//         await this.client.send(new UpdateCommand(params));
-//     }
-
-//     private async updateFollower(follow: Follow): Promise<void> {
-//         const params = {
-//             TableName: this.tableName,
-//             Key: this.generateFollowItem(follow),
-//             ExpressionAttributeValues: { ":val": follow.followerName },
-//             UpdateExpression: `SET ${this.followerNameAttr} = :val`,
-//         };
-//         await this.client.send(new UpdateCommand(params));
-//     }
-// }
+    private generateUserItem(alias: string) {
+        return {
+            [this.aliasAttr]: alias
+        };
+    }
+    
+}

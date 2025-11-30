@@ -3,6 +3,8 @@ import { DynamoFollowsDao } from "./follows/DynamoFollowsDao";
 import { FollowsDao } from "./follows/FollowsDao";
 import { DynamoSessionsDao } from "./sessions/DynamoSessionsDao";
 import { SessionsDao } from "./sessions/SessionsDao";
+import { DynamoUsersDao } from "./users/DynamoUsersDao";
+import { UsersDao } from "./users/UsersDao";
 
 
 export class DynamoDatabaseFactory implements DatabaseFactory {
@@ -15,4 +17,7 @@ export class DynamoDatabaseFactory implements DatabaseFactory {
         return new DynamoSessionsDao();
     }
 
+    createUsersDao(): UsersDao {
+        return new DynamoUsersDao();
+    }
 }
