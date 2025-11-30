@@ -10,7 +10,7 @@ export const handler = async(request: TweeterRequest): Promise<TweeterResponse> 
 
     const databaseProvider: DynamoDatabaseFactory = new DynamoDatabaseFactory();
     const authService = new AuthenticationService(databaseProvider);
-    authService.logUserOut(request.token, request.userAlias);
+    await authService.logUserOut(request.token, request.userAlias);
 
     return {
         success: true,
