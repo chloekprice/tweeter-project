@@ -25,6 +25,8 @@ class PostService {
 
         const newPost: Status = new Status(userAlias, newStatus.timestamp?? Date.now(), newStatus.post, segments);
         await this.statusesProvider.addStatus(newPost);
+
+        // TO-DO: add post to followers' feeds
     };
 }
 

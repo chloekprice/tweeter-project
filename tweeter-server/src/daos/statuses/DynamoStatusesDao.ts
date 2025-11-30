@@ -1,11 +1,7 @@
 import {
-  DeleteCommand,
   DynamoDBDocumentClient,
-  GetCommand,
   PutCommand,
   QueryCommand,
-  QueryCommandInput,
-  UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DataPage } from "../../entities/DataPage";
