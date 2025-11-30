@@ -34,12 +34,12 @@ class StatusService implements Service {
                 userAlias: lastItem!.user.alias, 
                 timestamp: lastItem!.timestamp, 
                 post: lastItem!.post, 
-                segments: lastItem!.segments.map(seg => ({
-                text: seg.text,
-                startPosition: seg.startPostion,
-                endPosition: seg.endPosition,
-                type: seg.type
-            }))
+                segments: (lastItem!.segments ?? []).map(seg => ({
+                    text: seg.text,
+                    startPosition: seg.startPostion,
+                    endPosition: seg.endPosition,
+                    type: seg.type
+                }))
             }
         const page = await this.statusesProvider.getPageOfStatuses(userAlias, pageSize, lastStatus);
         return [this.getStatusDtosFromPage(page, user), page.hasMorePages];
@@ -57,7 +57,7 @@ class StatusService implements Service {
                 userAlias: lastItem!.user.alias, 
                 timestamp: lastItem!.timestamp, 
                 post: lastItem!.post, 
-                segments: lastItem!.segments.map(seg => ({
+                segments: (lastItem!.segments ?? []).map(seg => ({
                 text: seg.text,
                 startPosition: seg.startPostion,
                 endPosition: seg.endPosition,
@@ -82,7 +82,7 @@ class StatusService implements Service {
             post: value.post, 
             user: userDto,
             timestamp: value.timestamp,
-            segments: value.segments.map(seg => ({
+            segments: (value.segments ?? []).map(seg => ({
                 text: seg.text,
                 startPostion: seg.startPosition,
                 endPosition: seg.endPosition,

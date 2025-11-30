@@ -8,12 +8,12 @@ export class Status {
 
     public constructor(
         user_alias: string,
-        timestamep: number,
+        timestamp: number,
         post: string,
         segments: Segment[]
     ) {
         this.userAlias = user_alias;
-        this.timestamp = timestamep;
+        this.timestamp = timestamp;
         this.post = post;
         this.segments = segments;
     }
