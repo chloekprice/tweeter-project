@@ -1,6 +1,8 @@
 import { DatabaseFactory } from "./DatabaseFactory";
 import { DynamoFollowsDao } from "./follows/DynamoFollowsDao";
 import { FollowsDao } from "./follows/FollowsDao";
+import { ImagesDao } from "./images/ImagesDao";
+import { S3ImagesDao } from "./images/S3ImagesDao";
 import { DynamoSessionsDao } from "./sessions/DynamoSessionsDao";
 import { SessionsDao } from "./sessions/SessionsDao";
 import { DynamoStatusesDao } from "./statuses/DynamoStatusesDao";
@@ -13,6 +15,10 @@ export class DynamoDatabaseFactory implements DatabaseFactory {
     
     createFollowsDao(): FollowsDao {
         return new DynamoFollowsDao();
+    }
+
+    createImagesDao(): ImagesDao {
+        return new S3ImagesDao();
     }
 
     createSessionsDao(): SessionsDao {

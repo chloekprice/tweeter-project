@@ -4,14 +4,17 @@ import { DatabaseFactory } from "../daos/DatabaseFactory";
 import { Session } from "../entities/Session";
 import { UsersDao } from "../daos/users/UsersDao";
 import { User } from "../entities/User";
+import { ImagesDao } from "../daos/images/ImagesDao";
 import bcrypt from "bcryptjs";
 
 
 class AuthenticationService {
+    private imagesProvider: ImagesDao;
     private sessionProvider: SessionsDao;
     private usersProvider: UsersDao;
     
     constructor(daoProvider: DatabaseFactory) {
+        this.imagesProvider = daoProvider.createImagesDao();
         this.sessionProvider = daoProvider.createSessionsDao();
         this.usersProvider = daoProvider.createUsersDao();
     }
@@ -41,10 +44,10 @@ class AuthenticationService {
     }
 
     public async register(firstName: string, lastName: string, alias: string, password: string, profileImage: string): Promise<[UserDto, AuthTokenDto]> {
-        // TO-DO: save image in s3
+        const profileImageUrl = await this.imagesProvider.putImage(`${alias}/profile`, profileImage);
         
         const hashedPassword = await bcrypt.hash(password, this.SALT_ROUNDS);
-        const newUser = new User(alias, firstName, lastName, hashedPassword, profileImage);
+        const newUser = new User(alias, firstName, lastName, hashedPassword, profileImageUrl);
         await this.usersProvider.addUser(newUser);
 
         const userDto = this.getUserDtoFromUser(newUser);
