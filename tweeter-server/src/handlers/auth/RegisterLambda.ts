@@ -1,6 +1,6 @@
 import { AuthenticationResponse, RegisterRequest } from "tweeter-shared";
 import AuthenticationService from "../../services/AuthenticationService";
-import { DynamoDatabaseFactory } from "../../daos/DynamoDatabaseFactory";
+import { DynamoDatabaseFactory } from "../../daos/AmazonDatabaseFactory";
 
 let databaseProvider: DynamoDatabaseFactory;
 let authService: AuthenticationService;

@@ -1,7 +1,7 @@
 import { PagedItemRequest, PagedItemResponse, UserDto } from "tweeter-shared";
 import FollowService from "../../services/FollowService";
 import { helper } from "../../utils/GetItemsHelper"
-import { DynamoDatabaseFactory } from "../../daos/DynamoDatabaseFactory";
+import { DynamoDatabaseFactory } from "../../daos/AmazonDatabaseFactory";
 
 const databaseProvider: DynamoDatabaseFactory = new DynamoDatabaseFactory();
 const followService = new FollowService(databaseProvider);

@@ -20,7 +20,11 @@ export class DynamoFeedsDao implements FeedsDao {
     readonly timestampAttr = "timestamp";
     readonly statusAttr = "status";
 
-    private readonly client = DynamoDBDocumentClient.from(new DynamoDBClient());
+    private readonly client;
+
+    public constructor(client: DynamoDBDocumentClient) {
+        this.client = client;
+    }
 
 
     async addToFeed(feedPost: Feed): Promise<void> {

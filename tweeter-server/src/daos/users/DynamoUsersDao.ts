@@ -18,7 +18,11 @@ export class DynamoUsersDao implements UsersDao {
     readonly passwordHashAttr = "password_hash";
     readonly imageUrlAttr = "image_url";
 
-    private readonly client = DynamoDBDocumentClient.from(new DynamoDBClient());
+    private readonly client;
+
+    public constructor(client: DynamoDBDocumentClient) {
+        this.client = client;
+    }
     
     async addUser(user: User): Promise<void> {
         const params = {

@@ -35,7 +35,11 @@ export class DynamoFollowsDao implements FollowsDao {
     readonly followerLastNameAttr = "follower_last_name";
     readonly followerImageUrlAttr = "follower_image_url";
 
-    private readonly client = DynamoDBDocumentClient.from(new DynamoDBClient());
+    private readonly client;
+
+    public constructor(client: DynamoDBDocumentClient) {
+        this.client = client;
+    }
 
 
     async addFollow(follow: Follow): Promise<void> {

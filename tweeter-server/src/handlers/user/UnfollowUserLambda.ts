@@ -1,7 +1,7 @@
 import { TweeterRequest, UpdateFollowStatusResponse } from "tweeter-shared";
 import { helper } from "../../utils/UpdateFollowStatusHelper"
 import UserService from "../../services/UserService";
-import { DynamoDatabaseFactory } from "../../daos/DynamoDatabaseFactory";
+import { DynamoDatabaseFactory } from "../../daos/AmazonDatabaseFactory";
 
 const databaseProvider: DynamoDatabaseFactory = new DynamoDatabaseFactory();
 const userService = new UserService(databaseProvider);

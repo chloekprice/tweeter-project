@@ -1,13 +1,18 @@
 import {
     S3Client,
     PutObjectCommand,
-    ObjectCannedACL,
 } from "@aws-sdk/client-s3";
 import { ImagesDao } from "./ImagesDao";
 
 export class S3ImagesDao implements ImagesDao {
     readonly bucketName = "cs340-tweeter-backend"
     readonly region = "us-east-1"
+
+    private readonly client;
+    
+    public constructor(client: S3Client) {
+        this.client = client;
+    }
 
     public async putImage(fileName: string, encodedImage: string): Promise<string> {
         const base64Data = encodedImage.includes(",")
@@ -32,10 +37,9 @@ export class S3ImagesDao implements ImagesDao {
         };
 
         const command = new PutObjectCommand(s3Params);
-        const client = new S3Client({ region: this.region });
 
         try {
-            await client.send(command);
+            await this.client.send(command);
             return (`https://${this.bucketName}.s3.${this.region}.amazonaws.com/image/${fileName}.${ext}`);
         } catch (error) {
             throw Error("Bad Request: failed to save profile image with: " + error);

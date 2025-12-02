@@ -18,7 +18,11 @@ export class DynamoSessionsDao implements SessionsDao  {
     readonly lastActivityAttr = "last_activity_timestamp";
     readonly ttlAttr = "ttl";
 
-    private readonly client = DynamoDBDocumentClient.from(new DynamoDBClient());
+    private readonly client;
+
+    public constructor(client: DynamoDBDocumentClient) {
+        this.client = client;
+    }
 
 
     async addSession(session: Session): Promise<void> {

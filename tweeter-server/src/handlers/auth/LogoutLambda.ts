@@ -2,7 +2,7 @@ import { TweeterRequest, TweeterResponse } from "tweeter-shared"
 import { checkRequestHelper } from "../../utils/CheckRequestHelper"
 import { checkAuthorizationHelper } from "../../utils/CheckAuthorizationHelper";
 import AuthenticationService from "../../services/AuthenticationService";
-import { DynamoDatabaseFactory } from "../../daos/DynamoDatabaseFactory";
+import { DynamoDatabaseFactory } from "../../daos/AmazonDatabaseFactory";
 
 let databaseProvider: DynamoDatabaseFactory;
 let authService: AuthenticationService;

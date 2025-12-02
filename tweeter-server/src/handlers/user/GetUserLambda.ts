@@ -2,7 +2,7 @@ import { GetUserResponse, TweeterRequest, UserDto } from "tweeter-shared"
 import UserService from "../../services/UserService";
 import { checkAuthorizationHelper } from "../../utils/CheckAuthorizationHelper";
 import { checkRequestHelper } from "../../utils/CheckRequestHelper";
-import { DynamoDatabaseFactory } from "../../daos/DynamoDatabaseFactory";
+import { DynamoDatabaseFactory } from "../../daos/AmazonDatabaseFactory";
 
 const databaseProvider: DynamoDatabaseFactory = new DynamoDatabaseFactory();
 const userService = new UserService(databaseProvider);

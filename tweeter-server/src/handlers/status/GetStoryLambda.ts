@@ -1,7 +1,7 @@
 import { PagedItemRequest, PagedItemResponse, StatusDto } from "tweeter-shared";
 import { helper } from "../../utils/GetItemsHelper"
 import StatusService from "../../services/StatusService";
-import { DynamoDatabaseFactory } from "../../daos/DynamoDatabaseFactory";
+import { DynamoDatabaseFactory } from "../../daos/AmazonDatabaseFactory";
 
 const databaseProvider: DynamoDatabaseFactory = new DynamoDatabaseFactory();
 const statusService = new StatusService(databaseProvider);

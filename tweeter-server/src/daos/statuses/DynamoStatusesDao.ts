@@ -16,7 +16,11 @@ export class DynamoStatusesDao implements StatusesDao {
     readonly postAttr = "post";
     readonly segmentsAttr = "segments";
 
-    private readonly client = DynamoDBDocumentClient.from(new DynamoDBClient());
+    private readonly client;
+
+    public constructor(client: DynamoDBDocumentClient) {
+        this.client = client;
+    }
 
     
     async addStatus(status: Status): Promise<void> {

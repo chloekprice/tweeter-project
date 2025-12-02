@@ -2,7 +2,7 @@ import { PostStatusRequest, TweeterResponse } from "tweeter-shared";
 import { checkAuthorizationHelper } from "../../utils/CheckAuthorizationHelper";
 import { checkRequestHelper } from "../../utils/CheckRequestHelper";
 import PostService from "../../services/PostService";
-import { DynamoDatabaseFactory } from "../../daos/DynamoDatabaseFactory";
+import { DynamoDatabaseFactory } from "../../daos/AmazonDatabaseFactory";
 
 const databaseProvider: DynamoDatabaseFactory = new DynamoDatabaseFactory();
 const postService: PostService = new PostService(databaseProvider);
