@@ -45,13 +45,11 @@ class FollowService extends Service {
     }
 
     private async loadMoreUsersFromDatabase(token: string, getPageOfUsers: () => Promise<DataPage<Follow>>, getUsersFromPage: (page: DataPage<Follow>) => UserDto[]): Promise<[UserDto[], boolean]>  {
-        if (!await this.checkAuthorization(token)) {
-            throw new Error("Unauthorized: Your session has expired.")
-        }
-        
-        const page = await getPageOfUsers();
-        const usersList = getUsersFromPage(page);
-        return [ usersList, page.hasMorePages]
+        return await this.performAuthorizedThrowingFunction<[UserDto[], boolean]>(token, async() => {
+            const page = await getPageOfUsers();
+            const usersList = getUsersFromPage(page);
+            return [usersList, page.hasMorePages]
+        });
     };
 
 }

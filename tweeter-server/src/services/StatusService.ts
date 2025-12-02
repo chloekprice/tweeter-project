@@ -14,56 +14,54 @@ class StatusService extends Service {
 
     public async loadMoreFeedStatuses (token: string, userAlias: string, pageSize: number, lastItem: StatusDto | null): Promise<[StatusDto[], boolean]>  {
         // TO-DO: update for feed
-        if (!await this.checkAuthorization(token)) {
-            throw new Error("Unauthorized: Your session has expired.")
-        }
 
-        const user = await Service.usersProvider.getUser(userAlias);
-        if (user == null) {
-            throw new Error(`Bad Request: the selected user ${userAlias} does not exist`);
-        }
-
-        const lastStatus = lastItem == null ? 
-            undefined : {
-                userAlias: lastItem!.user.alias, 
-                timestamp: lastItem!.timestamp, 
-                post: lastItem!.post, 
-                segments: (lastItem!.segments ?? []).map(seg => ({
-                    text: seg.text,
-                    startPosition: seg.startPostion,
-                    endPosition: seg.endPosition,
-                    type: seg.type
-                }))
+        return await this.performAuthorizedThrowingFunction<[StatusDto[], boolean]>(token, async () => {
+            const user = await Service.usersProvider.getUser(userAlias);
+            if (user == null) {
+                throw new Error(`The selected user ${userAlias} does not exist`);
             }
-        const page = await Service.statusesProvider.getPageOfStatuses(userAlias, pageSize, lastStatus);
-        return [this.getStatusDtosFromPage(page, user), page.hasMorePages];
+
+            const lastStatus = lastItem == null ? 
+                undefined : {
+                    userAlias: lastItem!.user.alias, 
+                    timestamp: lastItem!.timestamp, 
+                    post: lastItem!.post, 
+                    segments: (lastItem!.segments ?? []).map(seg => ({
+                        text: seg.text,
+                        startPosition: seg.startPostion,
+                        endPosition: seg.endPosition,
+                        type: seg.type
+                    }))
+                }
+            const page = await Service.statusesProvider.getPageOfStatuses(userAlias, pageSize, lastStatus);
+
+            return [this.getStatusDtosFromPage(page, user), page.hasMorePages];
+        });
     };
     
     public async loadMoreStoryStatuses (token: string, userAlias: string, pageSize: number, lastItem: StatusDto | null): Promise<[StatusDto[], boolean]> {
-        if (!await this.checkAuthorization(token)) {
-            throw new Error("Unauthorized: Your session has expired.")
-        }
+        return await this.performAuthorizedThrowingFunction<[StatusDto[], boolean]>(token, async () => {
+            const user = await Service.usersProvider.getUser(userAlias);
+            if (user == null) {
+                throw new Error(`The selected user ${userAlias} does not exist`);
+            }
 
-        const user = await Service.usersProvider.getUser(userAlias);
-        if (user == null) {
-            throw new Error(`Bad Request: the selected user ${userAlias} does not exist`);
-        }
-        
-        const lastStatus = lastItem == null ? 
-            undefined : {
-                userAlias: lastItem!.user.alias, 
-                timestamp: lastItem!.timestamp, 
-                post: lastItem!.post, 
-                segments: (lastItem!.segments ?? []).map(seg => ({
-                text: seg.text,
-                startPosition: seg.startPostion,
-                endPosition: seg.endPosition,
-                type: seg.type
-            }))
-        }
-        
-        const page = await Service.statusesProvider.getPageOfStatuses(userAlias, pageSize, lastStatus);
-        return [this.getStatusDtosFromPage(page, user), page.hasMorePages]
+            const lastStatus = lastItem == null ? 
+                undefined : {
+                    userAlias: lastItem!.user.alias, 
+                    timestamp: lastItem!.timestamp, 
+                    post: lastItem!.post, 
+                    segments: (lastItem!.segments ?? []).map(seg => ({
+                        text: seg.text,
+                        startPosition: seg.startPostion,
+                        endPosition: seg.endPosition,
+                        type: seg.type
+                    }))
+                }
+            const page = await Service.statusesProvider.getPageOfStatuses(userAlias, pageSize, lastStatus);
+            
+            return [this.getStatusDtosFromPage(page, user), page.hasMorePages];
+        });
     };
 
 

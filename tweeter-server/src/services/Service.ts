@@ -22,19 +22,39 @@ export class Service {
 
 
     protected async checkAuthorization(token: string): Promise<boolean> {
-        const result = await Service.sessionProvider.getSession(token);
+        return await this.performThrowingFunction<boolean>(async () => {
+            const result = await Service.sessionProvider.getSession(token);
 
-        if (typeof result ==="undefined") {
-            throw new Error("Unauthenticated: You cannot access the resource at this time");
+            if (typeof result ==="undefined") {
+                throw new Error("You cannot access the session resource at this time");
+            }
+
+            if ((result.lastActivityTimestamp + result.ttl) >= Date.now()) {
+                await Service.sessionProvider.updateSessionActivity(token);
+                return true;
+            }
+
+            await Service.sessionProvider.deleteSession(token, null);
+            return false;
+        });
+    }
+
+    protected async performAuthorizedThrowingFunction<T>(token: string, operation: () => Promise<T>): Promise<T> {
+        if (!await this.checkAuthorization(token)) {
+            throw new Error("Unauthorized: Your session has expired.")
         }
 
-        if (result.lastActivityTimestamp < (Date.now() + result.ttl)) {
-            await Service.sessionProvider.updateSessionActivity(token);
-            return true;
-        }
+        return await this.performThrowingFunction<T>(operation);
+    }
 
-        await Service.sessionProvider.deleteSession(token, null);
-        return false;
+    protected async performThrowingFunction<T>(operation: () => Promise<T>): Promise<T> {
+        try {
+            return await operation();
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : String(error);
+            console.error("Operation failed:", error);
+            throw new Error(`Internal Server Error: ${message}`);
+        }
     }
 
  }

@@ -7,73 +7,61 @@ class UserService extends Service {
 
     
     public async follow(token: string, userToFollow: string): Promise<[followerCount: number, followeeCount: number]>  {
-        if (!await this.checkAuthorization(token)) {
-            throw new Error("Unauthorized: Your session has expired.")
-        }
+        return await this.performAuthorizedThrowingFunction<[followerCount: number, followeeCount: number]>(token, async () => {
+            const currentUserSession = await Service.sessionProvider.getSession(token);
+            const currentUser = await Service.usersProvider.getUser(currentUserSession!.alias);
+            const otherUser = await Service.usersProvider.getUser(userToFollow);
 
-        const currentUserSession = await Service.sessionProvider.getSession(token);
-        const currentUser = await Service.usersProvider.getUser(currentUserSession!.alias);
-        const otherUser = await Service.usersProvider.getUser(userToFollow);
+            const newFollow: Follow = new Follow(
+                otherUser!.alias, otherUser!.firstName, otherUser!.lastName, otherUser!.imageUrl, 
+                currentUser!.alias, currentUser!.firstName, currentUser!.lastName, currentUser!.imageUrl
+            );
+            await Service.followsProvider.addFollow(newFollow);
 
-        const newFollow: Follow = new Follow(
-            otherUser!.alias, otherUser!.firstName, otherUser!.lastName, otherUser!.imageUrl, 
-            currentUser!.alias, currentUser!.firstName, currentUser!.lastName, currentUser!.imageUrl
-        );
-        await Service.followsProvider.addFollow(newFollow);
-
-        return await this.updateFollowingCounts(token, userToFollow);
+            return await this.updateFollowingCounts(token, userToFollow);
+        });
     };
 
     public async getFolloweeCount (token: string, userAlias: string): Promise<number> {
-        if (!await this.checkAuthorization(token)) {
-            throw new Error("Unauthorized: Your session has expired.")
-        }
-
-        return await Service.followsProvider.getFolloweeCount(userAlias);
+        return await this.performAuthorizedThrowingFunction<number>(token, async () => {
+            return await Service.followsProvider.getFolloweeCount(userAlias);
+        });
     };
 
     public async getFollowerCount (token: string, userAlias: string): Promise<number> {
-        if (!await this.checkAuthorization(token)) {
-            throw new Error("Unauthorized: Your session has expired.")
-        }
-
-        return await Service.followsProvider.getFollowerCount(userAlias);
+        return await this.performAuthorizedThrowingFunction<number>(token, async () => {
+            return await Service.followsProvider.getFollowerCount(userAlias);
+        });
     };
 
     public async getIsFollowerStatus(token: string, userAlias: string, selectedUserAlias: string): Promise<boolean> {
-        if (!await this.checkAuthorization(token)) {
-            throw new Error("Unauthorized: Your session has expired.")
-        }
-
-        const followCheck: Follow = new Follow(selectedUserAlias, "", "", "", userAlias, "", "", "");
-        const result: Follow | undefined = await Service.followsProvider.getFollow(followCheck);
-        return typeof result === "undefined" ? false : true
+        return await this.performAuthorizedThrowingFunction<boolean>(token, async () => {
+            const followCheck: Follow = new Follow(selectedUserAlias, "", "", "", userAlias, "", "", "");
+            const result: Follow | undefined = await Service.followsProvider.getFollow(followCheck);
+            return typeof result === "undefined" ? false : true
+        });
     };
 
     public async getUser (token: string, alias: string): Promise<UserDto | null>  {
-        if (!await this.checkAuthorization(token)) {
-            throw new Error("Unauthorized: Your session has expired.")
-        }
-
-        return await Service.usersProvider.getUser(alias);
+        return await this.performAuthorizedThrowingFunction<UserDto | null>(token, async () => {
+            return await Service.usersProvider.getUser(alias);
+        });
     };
 
     public async unfollow(token: string, userToUnfollow: string): Promise<[followerCount: number, followeeCount: number]> {
-        if (!await this.checkAuthorization(token)) {
-            throw new Error("Unauthorized: Your session has expired.")
-        }
+        return await this.performAuthorizedThrowingFunction<[followerCount: number, followeeCount: number]>(token, async () => {
+            const currentUserSession = await Service.sessionProvider.getSession(token);
+            const currentUser = await Service.usersProvider.getUser(currentUserSession!.alias);
+            const otherUser = await Service.usersProvider.getUser(userToUnfollow);
 
-        const currentUserSession = await Service.sessionProvider.getSession(token);
-        const currentUser = await Service.usersProvider.getUser(currentUserSession!.alias);
-        const otherUser = await Service.usersProvider.getUser(userToUnfollow);
+            const oldFollow: Follow = new Follow(
+                otherUser!.alias, otherUser!.firstName, otherUser!.lastName, otherUser!.imageUrl, 
+                currentUser!.alias, currentUser!.firstName, currentUser!.lastName, currentUser!.imageUrl
+            );
+            await Service.followsProvider.deleteFollow(oldFollow);
 
-        const oldFollow: Follow = new Follow(
-            otherUser!.alias, otherUser!.firstName, otherUser!.lastName, otherUser!.imageUrl, 
-            currentUser!.alias, currentUser!.firstName, currentUser!.lastName, currentUser!.imageUrl
-        );
-        await Service.followsProvider.deleteFollow(oldFollow);
-
-        return await this.updateFollowingCounts(token, userToUnfollow);
+            return await this.updateFollowingCounts(token, userToUnfollow);
+        });
     };
 
 

@@ -6,42 +6,43 @@ import { Service } from "./Service";
 
 
 class AuthenticationService extends Service {
-    TIME_TO_LIVE: number = 1800000 // 30 minutes
+    TIME_TO_LIVE: number = 300000 // 5 minutes
     SALT_ROUNDS: number = 10
 
-    public async logUserOut(token: string, userAlias: string): Promise<void> {
-        await Service.sessionProvider.deleteSession(token, userAlias);
+   public async logUserOut(token: string, userAlias: string): Promise<void> {
+        return await this.performThrowingFunction<void> (async () => 
+            await Service.sessionProvider.deleteSession(token, userAlias)
+        );
     }
 
+
     public async login(alias: string, password: string): Promise<[UserDto, AuthTokenDto]>  {
-        const user = await Service.usersProvider.getUser(alias);
+        return await this.performThrowingFunction<[UserDto, AuthTokenDto]> (async () => {
+            const user = await Service.usersProvider.getUser(alias);
 
-        if (user == null) {
-            throw new Error(`Unauthorized Request: No user with alias ${alias} exists`)
-        }
-        
-        if (!await bcrypt.compare(password, user.passwordHash)) {
-            throw new Error(`Unauthorized Request: Incorrect password was entered.`);
-        }
+            if (user == null) {
+                throw new Error(`No user with alias ${alias} exists`)
+            }
+            
+            if (!await bcrypt.compare(password, user.passwordHash)) {
+                throw new Error(`Incorrect password was entered.`);
+            }
 
-        const userDto = this.getUserDtoFromUser(user);
-        const authTokenDto = await this.authenticateUser(alias);
-        
-        return [userDto, authTokenDto];
+            return this.createDtos(user);
+        });
     }
 
     public async register(firstName: string, lastName: string, alias: string, password: string, profileImage: string): Promise<[UserDto, AuthTokenDto]> {
-        const username = alias.startsWith("@") ? alias.slice(1) : alias;
-        const profileImageUrl = await Service.imagesProvider.putImage(`${username}/profile`, profileImage);
-        
-        const hashedPassword = await bcrypt.hash(password, this.SALT_ROUNDS);
-        const newUser = new User(alias, firstName, lastName, hashedPassword, profileImageUrl);
-        await Service.usersProvider.addUser(newUser);
-
-        const userDto = this.getUserDtoFromUser(newUser);
-        const authTokenDto = await this.authenticateUser(alias);
-        
-        return [userDto, authTokenDto];
+        return await this.performThrowingFunction<[UserDto, AuthTokenDto]>(async() => {
+            const username = alias.startsWith("@") ? alias.slice(1) : alias;
+            const profileImageUrl = await Service.imagesProvider.putImage(`${username}/profile`, profileImage);
+            
+            const hashedPassword = await bcrypt.hash(password, this.SALT_ROUNDS);
+            const newUser = new User(alias, firstName, lastName, hashedPassword, profileImageUrl);
+            await Service.usersProvider.addUser(newUser);
+            
+            return await this.createDtos(newUser);
+        });
     }
 
 
@@ -51,10 +52,17 @@ class AuthenticationService extends Service {
 
         await Service.sessionProvider.addSession(newSession);
 
-        return this.getAuthTokenFromSession(newSession);
+        return this.getAuthTokenDtoFromSession(newSession);
     }
 
-    private getAuthTokenFromSession(session: Session): AuthTokenDto {
+    private async createDtos(user: User): Promise<[UserDto, AuthTokenDto]> {
+        const userDto = this.getUserDtoFromUser(user);
+        const authTokenDto = await this.authenticateUser(user.alias);
+
+        return [userDto, authTokenDto];
+    }
+
+    private getAuthTokenDtoFromSession(session: Session): AuthTokenDto {
         return {
             token: session.token,
             timestamp: session.lastActivityTimestamp

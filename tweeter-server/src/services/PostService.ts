@@ -6,21 +6,19 @@ import { Service } from "./Service";
 class PostService extends Service {
 
     public async postStatus(token: string, userAlias: string, newStatus: StatusDto): Promise<void> {
-        if (!await this.checkAuthorization(token)) {
-            throw new Error("Unauthorized: Your session has expired.")
-        }
+        return await this.performAuthorizedThrowingFunction<void>(token, async() => {
+            const segments: Segment[] = (newStatus.segments ?? []).map(seg => ({
+                text: seg.text,
+                startPosition: seg.startPostion,
+                endPosition: seg.endPosition,
+                type: seg.type
+            }))
 
-        const segments: Segment[] = (newStatus.segments ?? []).map(seg => ({
-            text: seg.text,
-            startPosition: seg.startPostion,
-            endPosition: seg.endPosition,
-            type: seg.type
-        }))
+            const newPost: Status = new Status(userAlias, newStatus.timestamp?? Date.now(), newStatus.post, segments);
+            await Service.statusesProvider.addStatus(newPost);
 
-        const newPost: Status = new Status(userAlias, newStatus.timestamp?? Date.now(), newStatus.post, segments);
-        await Service.statusesProvider.addStatus(newPost);
-
-        // TO-DO: add post to followers' feeds
+            // TO-DO: add post to followers' feeds
+        });
     };
 }
 
