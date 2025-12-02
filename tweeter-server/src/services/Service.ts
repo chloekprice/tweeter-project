@@ -41,7 +41,7 @@ export class Service {
 
     protected async performAuthorizedThrowingFunction<T>(token: string, operation: () => Promise<T>): Promise<T> {
         if (!await this.checkAuthorization(token)) {
-            throw new Error("Unauthorized: Your session has expired.")
+            throw new Error("Unauthorized- Your session has expired.")
         }
 
         return await this.performThrowingFunction<T>(operation);
@@ -52,8 +52,8 @@ export class Service {
             return await operation();
         } catch (error: unknown) {
             const message = error instanceof Error ? error.message : String(error);
-            console.error("Operation failed:", error);
-            throw new Error(`Internal Server Error: ${message}`);
+            console.error("Operation failed-", error);
+            throw new Error(`Internal Server Error- ${message}`);
         }
     }
 
