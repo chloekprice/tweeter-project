@@ -44,6 +44,7 @@ export class DynamoFeedsDao implements FeedsDao {
             },
             TableName: this.tableName, // PRIMARY TABLE
             Limit: pageSize,
+            ScanIndexForward: false,
             ExclusiveStartKey: 
                 lastItem === undefined 
                 ? undefined : {

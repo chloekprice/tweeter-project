@@ -18,7 +18,7 @@ class FollowService extends Service {
     public async loadMoreFollowers(token: string, userAlias: string, pageSize: number, lastFollower: UserDto | null): Promise<[UserDto[], boolean]> {
         return await this.loadMoreUsersFromDatabase(
             token,
-            () => Service.followsProvider.getPageOfFollowees(userAlias, pageSize, lastFollower?.alias),
+            () => Service.followsProvider.getPageOfFollowers(userAlias, pageSize, lastFollower?.alias),
             this.getFollowersFromPage
         );
     };

@@ -90,7 +90,7 @@ export class DynamoFollowsDao implements FollowsDao {
 
     async getFolloweeCount(alias: string): Promise<number> {
         const params: QueryCommandInput = {
-            TableName: this.tableName, // PRIMARY TABLE
+            TableName: this.tableName,
             KeyConditionExpression: `${this.followerHandleAttr} = :alias`,
             ExpressionAttributeValues: { ":alias": alias },
             Select: "COUNT",
@@ -104,7 +104,7 @@ export class DynamoFollowsDao implements FollowsDao {
     async getFollowerCount(alias: string): Promise<number> {
         const params: QueryCommandInput = {
             TableName: this.tableName,
-            IndexName: this.indexName, // GSI
+            IndexName: this.indexName,
             KeyConditionExpression: `${this.followeeHandleAttr} = :alias`,
             ExpressionAttributeValues: { ":alias": alias },
             Select: "COUNT",
@@ -207,14 +207,14 @@ export class DynamoFollowsDao implements FollowsDao {
         const params = {
             TableName: this.tableName,
             Item: {
+                [this.followerHandleAttr]: follow.followerHandle,
                 [this.followeeHandleAttr]: follow.followeeHandle,
+                [this.followerFirstNameAttr]: follow.followerFirstName,
+                [this.followerLastNameAttr]: follow.followerLastName,
+                [this.followerImageUrlAttr]: follow.followerImageUrl,
                 [this.followeeFirstNameAttr]: follow.followeeFirstName,
                 [this.followeeLastNameAttr]: follow.followeeLastName,
                 [this.followeeImageUrlAttr]: follow.followeeImageUrl,
-                [this.followerHandleAttr]: follow.followerHandle,
-                [this.followerFirstNameAttr]: follow.followerFirstName,
-                [this.followerLastNameAttr]: follow.followerLastName,
-                [this.followerImageUrlAttr]: follow.followerImageUrl
             },
         };
         await this.client.send(new PutCommand(params));

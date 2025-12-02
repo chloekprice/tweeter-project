@@ -40,6 +40,7 @@ export class DynamoStatusesDao implements StatusesDao {
             },
             TableName: this.tableName, // PRIMARY TABLE
             Limit: pageSize,
+            ScanIndexForward: false,
             ExclusiveStartKey: 
                 lastItem === undefined 
                 ? undefined : {
