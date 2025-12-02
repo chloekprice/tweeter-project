@@ -4,12 +4,18 @@ import { checkAuthorizationHelper } from "../../utils/CheckAuthorizationHelper";
 import AuthenticationService from "../../services/AuthenticationService";
 import { DynamoDatabaseFactory } from "../../daos/DynamoDatabaseFactory";
 
+let databaseProvider: DynamoDatabaseFactory;
+let authService: AuthenticationService;
+
 export const handler = async(request: TweeterRequest): Promise<TweeterResponse> => {
     checkRequestHelper(request);
     checkAuthorizationHelper(request);
 
-    const databaseProvider: DynamoDatabaseFactory = new DynamoDatabaseFactory();
-    const authService = new AuthenticationService(databaseProvider);
+    if (!databaseProvider) {
+        databaseProvider = new DynamoDatabaseFactory();
+        authService = new AuthenticationService(databaseProvider);
+    }
+
     await authService.logUserOut(request.token, request.userAlias);
 
     return {

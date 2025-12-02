@@ -3,10 +3,11 @@ import { helper } from "../../utils/GetItemsHelper"
 import StatusService from "../../services/StatusService";
 import { DynamoDatabaseFactory } from "../../daos/DynamoDatabaseFactory";
 
+const databaseProvider: DynamoDatabaseFactory = new DynamoDatabaseFactory();
+const statusService = new StatusService(databaseProvider);
+
 export const handler = async (request: PagedItemRequest<StatusDto>): Promise<PagedItemResponse<StatusDto>> => {
     return await helper<StatusDto>(request, async (token: string, userAlias: string, pageSize: number, lastItem: StatusDto | null) => {
-        const databaseProvider: DynamoDatabaseFactory = new DynamoDatabaseFactory();
-        const statusService = new StatusService(databaseProvider);
         return await statusService.loadMoreStoryStatuses(token, userAlias, pageSize, lastItem);
     });
 }
