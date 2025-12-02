@@ -115,6 +115,24 @@ export class DynamoFollowsDao implements FollowsDao {
         return result.Count ?? 0;
     }
 
+    async getFollowers(alias: string): Promise<string[]> {
+        const params: QueryCommandInput = {
+            TableName: this.tableName,
+            IndexName: this.indexName, // GSI
+            KeyConditionExpression: `${this.followeeHandleAttr} = :alias`,
+            ExpressionAttributeValues: { ":alias": alias }
+        };
+
+        const items: string[] = [];
+        const result = await this.client.send(new QueryCommand(params));
+
+        result.Items?.forEach( (item) =>
+            items.push(item[this.followerHandleAttr] ?? "")
+        )
+
+        return items;
+    }
+
     async getPageOfFollowees(followerHandle: string, pageSize: number, lastFolloweeHandle: string | undefined): Promise<DataPage<Follow>> {
         const params = {
             KeyConditionExpression: `${this.followerHandleAttr} = :follower`,

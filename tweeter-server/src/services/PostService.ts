@@ -2,6 +2,8 @@ import { StatusDto } from "tweeter-shared";
 import { Status } from "../entities/Status";
 import { Segment } from "../entities/Segment";
 import { Service } from "./Service";
+import { User } from "../entities/User";
+import { Feed } from "../entities/Feed";
 
 class PostService extends Service {
 
@@ -15,9 +17,18 @@ class PostService extends Service {
             }))
 
             const newPost: Status = new Status(userAlias, newStatus.timestamp?? Date.now(), newStatus.post, segments);
-            await Service.statusesProvider.addStatus(newPost);
+            await Service.statusesProvider.addStatus({...newPost});
 
-            // TO-DO: add post to followers' feeds
+            const currentUser = await Service.usersProvider.getUser(userAlias);
+            const followers = await Service.followsProvider.getFollowers(userAlias);
+
+            const newFeedPost = new Feed(userAlias, {...currentUser!}, newPost.timestamp, {...newPost});
+            await Service.feedsProvider.addToFeed({...newFeedPost});
+
+            followers.forEach( async(follower) => {
+                let feedPost = new Feed(follower, {...currentUser!}, newPost.timestamp, {...newPost});
+                await Service.feedsProvider.addToFeed({...feedPost});
+            });
         });
     };
 }

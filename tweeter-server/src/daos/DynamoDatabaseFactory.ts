@@ -1,4 +1,6 @@
 import { DatabaseFactory } from "./DatabaseFactory";
+import { DynamoFeedsDao } from "./feeds/DynamoFeedsDao";
+import { FeedsDao } from "./feeds/FeedsDao";
 import { DynamoFollowsDao } from "./follows/DynamoFollowsDao";
 import { FollowsDao } from "./follows/FollowsDao";
 import { ImagesDao } from "./images/ImagesDao";
@@ -12,6 +14,11 @@ import { UsersDao } from "./users/UsersDao";
 
 
 export class DynamoDatabaseFactory implements DatabaseFactory {
+
+
+    createFeedsDao(): FeedsDao {
+        return new DynamoFeedsDao();
+    }
     
     createFollowsDao(): FollowsDao {
         return new DynamoFollowsDao();

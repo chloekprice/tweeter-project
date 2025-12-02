@@ -1,17 +1,21 @@
 import { Status } from "./Status";
+import { User } from "./User";
 
 export class Feed {
     userAlias: string; // PK
+    user: User;
     timestamp: number; // SK
-    statuses: Status[]; 
+    status: Status; 
 
     public constructor (
         user_alias: string,
+        user: User,
         timestamp: number,
-        statuses: Status[]
+        status: Status
     ) {
         this.userAlias = user_alias;
+        this.user = user;
         this.timestamp = timestamp;
-        this.statuses = statuses;
+        this.status = status;
     }
 }
