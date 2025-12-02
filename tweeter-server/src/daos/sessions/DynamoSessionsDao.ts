@@ -3,7 +3,8 @@ import {
   DynamoDBDocumentClient,
   GetCommand,
   PutCommand,
-  QueryCommand
+  QueryCommand,
+  UpdateCommand
 } from "@aws-sdk/lib-dynamodb";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { Session } from "../../entities/Session";
@@ -33,7 +34,7 @@ export class DynamoSessionsDao implements SessionsDao  {
         await this.client.send(new PutCommand(params));
     }
 
-    async deleteSession(token: string, alias: string): Promise<void> {
+    async deleteSession(token: string, alias: string | null): Promise<void> {
         const deleteParamas = {
             TableName: this.tableName,
             Key: this.generateSessionItem(token),
@@ -41,6 +42,8 @@ export class DynamoSessionsDao implements SessionsDao  {
 
         await this.client.send(new DeleteCommand(deleteParamas));
 
+        if (alias == null) { return; }
+        
         const queryParams = {
             TableName: this.tableName,
             IndexName: this.indexName,
@@ -79,6 +82,19 @@ export class DynamoSessionsDao implements SessionsDao  {
             output.Item[this.ttlAttr]
         );
     }
+
+    async updateSessionActivity(token: string): Promise<void> {
+        const params = {
+            TableName: this.tableName,
+            Key: this.generateSessionItem(token),
+            UpdateExpression: `SET ${this.lastActivityAttr} = :val`,
+            ExpressionAttributeValues: {
+                ":val": Date.now(),
+            },
+        };
+
+        await this.client.send(new UpdateCommand(params));
+  }
 
 
     private generateSessionItem(token: string) {
