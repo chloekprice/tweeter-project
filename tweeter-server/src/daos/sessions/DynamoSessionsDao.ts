@@ -1,0 +1,109 @@
+import {
+  DeleteCommand,
+  DynamoDBDocumentClient,
+  GetCommand,
+  PutCommand,
+  QueryCommand,
+  UpdateCommand
+} from "@aws-sdk/lib-dynamodb";
+import { Session } from "../../entities/Session";
+import { SessionsDao } from "./SessionsDao";
+
+export class DynamoSessionsDao implements SessionsDao  {
+    readonly tableName = "sessions";
+    readonly indexName = "session-gs-index";
+    readonly tokenAttr = "token";
+    readonly aliasAttr = "alias";
+    readonly lastActivityAttr = "last_activity_timestamp";
+    readonly ttlAttr = "ttl";
+
+    private readonly client;
+
+    public constructor(client: DynamoDBDocumentClient) {
+        this.client = client;
+    }
+
+
+    async addSession(session: Session): Promise<void> {
+        const params = {
+            TableName: this.tableName,
+            Item: {
+                [this.tokenAttr]: session.token,
+                [this.aliasAttr]: session.alias,
+                [this.lastActivityAttr]: session.lastActivityTimestamp,
+                [this.ttlAttr]: session.ttl
+            },
+        };
+        await this.client.send(new PutCommand(params));
+    }
+
+    async deleteSession(token: string, alias: string | null): Promise<void> {
+        const deleteParamas = {
+            TableName: this.tableName,
+            Key: this.generateSessionItem(token),
+        };
+
+        await this.client.send(new DeleteCommand(deleteParamas));
+
+        if (alias == null) { return; }
+        
+        const queryParams = {
+            TableName: this.tableName,
+            IndexName: this.indexName,
+            KeyConditionExpression: `${this.aliasAttr} = :alias`,
+            ExpressionAttributeValues: {
+                ":alias": alias
+            }
+        };
+
+        const sessions = await this.client.send(new QueryCommand(queryParams));
+        
+        const deletePromises = (sessions.Items ?? []).map(item =>
+            this.client.send(new DeleteCommand({
+                TableName: this.tableName,
+                Key: this.generateSessionItem(item.token)
+            }))
+        );
+
+        await Promise.all(deletePromises);
+    }
+
+    async getSession(token: string): Promise<Session | undefined> {
+        const params = {
+            TableName: this.tableName,
+            Key: this.generateSessionItem(token),
+        };
+
+        const output = await this.client.send(new GetCommand(params));
+
+        return output.Item == undefined
+        ? undefined
+        : new Session(
+            output.Item[this.tokenAttr],
+            output.Item[this.aliasAttr],
+            output.Item[this.lastActivityAttr],
+            output.Item[this.ttlAttr]
+        );
+    }
+
+    async updateSessionActivity(token: string): Promise<void> {
+        const params = {
+            TableName: this.tableName,
+            Key: this.generateSessionItem(token),
+            UpdateExpression: `SET ${this.lastActivityAttr} = :val`,
+            ExpressionAttributeValues: {
+                ":val": Date.now(),
+            },
+        };
+
+        await this.client.send(new UpdateCommand(params));
+  }
+
+
+    private generateSessionItem(token: string) {
+        return {
+            [this.tokenAttr]: token
+        };
+    }
+
+}
