@@ -6,7 +6,6 @@ import {
   QueryCommand,
   UpdateCommand
 } from "@aws-sdk/lib-dynamodb";
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { Session } from "../../entities/Session";
 import { SessionsDao } from "./SessionsDao";
 

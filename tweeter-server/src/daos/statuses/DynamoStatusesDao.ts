@@ -3,7 +3,6 @@ import {
   PutCommand,
   QueryCommand,
 } from "@aws-sdk/lib-dynamodb";
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DataPage } from "../../entities/DataPage";
 import { Status } from "../../entities/Status";
 import { StatusesDao } from "./StatusesDao";
