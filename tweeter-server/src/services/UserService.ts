@@ -7,19 +7,9 @@ class UserService extends Service {
 
     
     public async follow(token: string, userToFollow: string): Promise<[followerCount: number, followeeCount: number]>  {
-        return await this.performAuthorizedThrowingFunction<[followerCount: number, followeeCount: number]>(token, async () => {
-            const currentUserSession = await Service.sessionProvider.getSession(token);
-            const currentUser = await Service.usersProvider.getUser(currentUserSession!.alias);
-            const otherUser = await Service.usersProvider.getUser(userToFollow);
-
-            const newFollow: Follow = new Follow(
-                otherUser!.alias, otherUser!.firstName, otherUser!.lastName, otherUser!.imageUrl, 
-                currentUser!.alias, currentUser!.firstName, currentUser!.lastName, currentUser!.imageUrl
-            );
+        return this.updateFollowStatus(token, userToFollow, async (newFollow) => {
             await Service.followsProvider.addFollow(newFollow);
-
-            return await this.updateFollowingCounts(token, userToFollow);
-        });
+        })
     };
 
     public async getFolloweeCount (token: string, userAlias: string): Promise<number> {
@@ -49,21 +39,32 @@ class UserService extends Service {
     };
 
     public async unfollow(token: string, userToUnfollow: string): Promise<[followerCount: number, followeeCount: number]> {
+        return this.updateFollowStatus(token, userToUnfollow, async (oldFollow) => {
+            await Service.followsProvider.deleteFollow(oldFollow);
+        })
+    };
+
+
+    private async updateFollowStatus(
+        token: string, 
+        otherUserAlias: string, 
+        updateFunction: (updatedFollow: Follow) => Promise<void>
+    ): Promise<[followerCount: number, followeeCount: number]> {
         return await this.performAuthorizedThrowingFunction<[followerCount: number, followeeCount: number]>(token, async () => {
             const currentUserSession = await Service.sessionProvider.getSession(token);
             const currentUser = await Service.usersProvider.getUser(currentUserSession!.alias);
-            const otherUser = await Service.usersProvider.getUser(userToUnfollow);
+            const otherUser = await Service.usersProvider.getUser(otherUserAlias);
 
-            const oldFollow: Follow = new Follow(
+            const updatedFollow: Follow = new Follow(
                 otherUser!.alias, otherUser!.firstName, otherUser!.lastName, otherUser!.imageUrl, 
                 currentUser!.alias, currentUser!.firstName, currentUser!.lastName, currentUser!.imageUrl
             );
-            await Service.followsProvider.deleteFollow(oldFollow);
 
-            return await this.updateFollowingCounts(token, userToUnfollow);
+            await updateFunction(updatedFollow);
+
+            return await this.updateFollowingCounts(token, otherUserAlias);
         });
     };
-
 
     private async updateFollowingCounts(token: string, userToUpdate: string): Promise<[followerCount: number, followeeCount: number]> {
         const followerCount = await this.getFollowerCount(token, userToUpdate);
