@@ -9,22 +9,16 @@ import { User } from "../entities/User";
 import { Status } from "../entities/Status";
 
 
-class StatusService implements Service {
-    private sessionProvider: SessionsDao;
-    private statusesProvider: StatusesDao;
-    private usersProvider: UsersDao;
-    
-    constructor(daoProvider: DatabaseFactory) {
-        this.sessionProvider = daoProvider.createSessionsDao();
-        this.statusesProvider = daoProvider.createStatusesDao();
-        this.usersProvider = daoProvider.createUsersDao();
-    }
+class StatusService extends Service {
 
 
     public async loadMoreFeedStatuses (token: string, userAlias: string, pageSize: number, lastItem: StatusDto | null): Promise<[StatusDto[], boolean]>  {
         // TO-DO: update for feed
-        // TO-DO: check authorization
-        const user = await this.usersProvider.getUser(userAlias);
+        if (!await this.checkAuthorization(token)) {
+            throw new Error("Unauthorized: Your session has expired.")
+        }
+
+        const user = await Service.usersProvider.getUser(userAlias);
         if (user == null) {
             throw new Error(`Bad Request: the selected user ${userAlias} does not exist`);
         }
@@ -41,13 +35,16 @@ class StatusService implements Service {
                     type: seg.type
                 }))
             }
-        const page = await this.statusesProvider.getPageOfStatuses(userAlias, pageSize, lastStatus);
+        const page = await Service.statusesProvider.getPageOfStatuses(userAlias, pageSize, lastStatus);
         return [this.getStatusDtosFromPage(page, user), page.hasMorePages];
     };
     
     public async loadMoreStoryStatuses (token: string, userAlias: string, pageSize: number, lastItem: StatusDto | null): Promise<[StatusDto[], boolean]> {
-        // TO-DO: check authorization
-        const user = await this.usersProvider.getUser(userAlias);
+        if (!await this.checkAuthorization(token)) {
+            throw new Error("Unauthorized: Your session has expired.")
+        }
+
+        const user = await Service.usersProvider.getUser(userAlias);
         if (user == null) {
             throw new Error(`Bad Request: the selected user ${userAlias} does not exist`);
         }
@@ -65,7 +62,7 @@ class StatusService implements Service {
             }))
         }
         
-        const page = await this.statusesProvider.getPageOfStatuses(userAlias, pageSize, lastStatus);
+        const page = await Service.statusesProvider.getPageOfStatuses(userAlias, pageSize, lastStatus);
         return [this.getStatusDtosFromPage(page, user), page.hasMorePages]
     };
 

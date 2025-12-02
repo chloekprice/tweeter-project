@@ -1,33 +1,20 @@
 import { AuthTokenDto, UserDto } from "tweeter-shared";
-import { SessionsDao } from "../daos/sessions/SessionsDao";
-import { DatabaseFactory } from "../daos/DatabaseFactory";
 import { Session } from "../entities/Session";
-import { UsersDao } from "../daos/users/UsersDao";
 import { User } from "../entities/User";
-import { ImagesDao } from "../daos/images/ImagesDao";
 import bcrypt from "bcryptjs";
+import { Service } from "./Service";
 
 
-class AuthenticationService {
-    private imagesProvider: ImagesDao;
-    private sessionProvider: SessionsDao;
-    private usersProvider: UsersDao;
-    
-    constructor(daoProvider: DatabaseFactory) {
-        this.imagesProvider = daoProvider.createImagesDao();
-        this.sessionProvider = daoProvider.createSessionsDao();
-        this.usersProvider = daoProvider.createUsersDao();
-    }
-    
+class AuthenticationService extends Service {
     TIME_TO_LIVE: number = 1800000 // 30 minutes
     SALT_ROUNDS: number = 10
 
     public async logUserOut(token: string, userAlias: string): Promise<void> {
-        await this.sessionProvider.deleteSession(token, userAlias);
+        await Service.sessionProvider.deleteSession(token, userAlias);
     }
 
     public async login(alias: string, password: string): Promise<[UserDto, AuthTokenDto]>  {
-        const user = await this.usersProvider.getUser(alias);
+        const user = await Service.usersProvider.getUser(alias);
 
         if (user == null) {
             throw new Error(`Unauthorized Request: No user with alias ${alias} exists`)
@@ -45,11 +32,11 @@ class AuthenticationService {
 
     public async register(firstName: string, lastName: string, alias: string, password: string, profileImage: string): Promise<[UserDto, AuthTokenDto]> {
         const username = alias.startsWith("@") ? alias.slice(1) : alias;
-        const profileImageUrl = await this.imagesProvider.putImage(`${username}/profile`, profileImage);
+        const profileImageUrl = await Service.imagesProvider.putImage(`${username}/profile`, profileImage);
         
         const hashedPassword = await bcrypt.hash(password, this.SALT_ROUNDS);
         const newUser = new User(alias, firstName, lastName, hashedPassword, profileImageUrl);
-        await this.usersProvider.addUser(newUser);
+        await Service.usersProvider.addUser(newUser);
 
         const userDto = this.getUserDtoFromUser(newUser);
         const authTokenDto = await this.authenticateUser(alias);
@@ -62,7 +49,7 @@ class AuthenticationService {
         const token = crypto.randomUUID(); 
         const newSession: Session = new Session(token, alias, Date.now(), this.TIME_TO_LIVE);
 
-        await this.sessionProvider.addSession(newSession);
+        await Service.sessionProvider.addSession(newSession);
 
         return this.getAuthTokenFromSession(newSession);
     }

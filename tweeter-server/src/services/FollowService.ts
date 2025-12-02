@@ -1,23 +1,16 @@
 import { UserDto } from "tweeter-shared";
 import { Service } from "./Service";
-import { DatabaseFactory } from "../daos/DatabaseFactory";
-import { FollowsDao } from "../daos/follows/FollowsDao";
 import { DataPage } from "../entities/DataPage";
 import { Follow } from "../entities/Follow";
 
 
-class FollowService implements Service {
-    private followsProvider: FollowsDao;
+class FollowService extends Service {
 
-    constructor(daoProvider: DatabaseFactory) {
-        this.followsProvider = daoProvider.createFollowsDao();
-    }
-    
 
     public async loadMoreFollowees(token: string, userAlias: string, pageSize: number, lastFollowee: UserDto | null): Promise<[UserDto[], boolean]>  {
         return await this.loadMoreUsersFromDatabase(
             token,
-            () => this.followsProvider.getPageOfFollowees(userAlias, pageSize, lastFollowee?.alias),
+            () => Service.followsProvider.getPageOfFollowees(userAlias, pageSize, lastFollowee?.alias),
             this.getFolloweesFromPage
         );
     };
@@ -25,7 +18,7 @@ class FollowService implements Service {
     public async loadMoreFollowers(token: string, userAlias: string, pageSize: number, lastFollower: UserDto | null): Promise<[UserDto[], boolean]> {
         return await this.loadMoreUsersFromDatabase(
             token,
-            () => this.followsProvider.getPageOfFollowees(userAlias, pageSize, lastFollower?.alias),
+            () => Service.followsProvider.getPageOfFollowees(userAlias, pageSize, lastFollower?.alias),
             this.getFollowersFromPage
         );
     };
@@ -52,7 +45,10 @@ class FollowService implements Service {
     }
 
     private async loadMoreUsersFromDatabase(token: string, getPageOfUsers: () => Promise<DataPage<Follow>>, getUsersFromPage: (page: DataPage<Follow>) => UserDto[]): Promise<[UserDto[], boolean]>  {
-        // TO-DO: check authorization
+        if (!await this.checkAuthorization(token)) {
+            throw new Error("Unauthorized: Your session has expired.")
+        }
+        
         const page = await getPageOfUsers();
         const usersList = getUsersFromPage(page);
         return [ usersList, page.hasMorePages]
