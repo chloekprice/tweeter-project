@@ -1,9 +1,9 @@
 import { PagedItemRequest, PagedItemResponse, StatusDto } from "tweeter-shared";
 import { helper } from "../../utils/GetItemsHelper"
 import StatusService from "../../services/StatusService";
-import { DynamoDatabaseFactory } from "../../daos/AmazonDatabaseFactory";
+import { AmazonDatabaseFactory } from "../../daos/AmazonDatabaseFactory";
 
-const databaseProvider: DynamoDatabaseFactory = new DynamoDatabaseFactory();
+const databaseProvider: AmazonDatabaseFactory = new AmazonDatabaseFactory();
 const statusService = new StatusService(databaseProvider);
 
 export const handler = async (request: PagedItemRequest<StatusDto>): Promise<PagedItemResponse<StatusDto>> => {

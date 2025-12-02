@@ -1,15 +1,15 @@
 import { AuthenticationRequest, AuthenticationResponse } from "tweeter-shared";
 import AuthenticationService from "../../services/AuthenticationService";
-import { DynamoDatabaseFactory } from "../../daos/AmazonDatabaseFactory";
+import { AmazonDatabaseFactory } from "../../daos/AmazonDatabaseFactory";
 
-let databaseProvider: DynamoDatabaseFactory;
+let databaseProvider: AmazonDatabaseFactory;
 let authService: AuthenticationService;
 
 export const handler = async (request: AuthenticationRequest): Promise<AuthenticationResponse> => {
     if (!request.alias || !request.password) { throw new Error("Bad Request: the request does not include all required parameters") }
 
     if (!databaseProvider) {
-        databaseProvider = new DynamoDatabaseFactory();
+        databaseProvider = new AmazonDatabaseFactory();
         authService = new AuthenticationService(databaseProvider);
     }
 

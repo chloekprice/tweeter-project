@@ -2,9 +2,9 @@ import { TweeterRequest, TweeterResponse } from "tweeter-shared"
 import { checkRequestHelper } from "../../utils/CheckRequestHelper"
 import { checkAuthorizationHelper } from "../../utils/CheckAuthorizationHelper";
 import AuthenticationService from "../../services/AuthenticationService";
-import { DynamoDatabaseFactory } from "../../daos/AmazonDatabaseFactory";
+import { AmazonDatabaseFactory } from "../../daos/AmazonDatabaseFactory";
 
-let databaseProvider: DynamoDatabaseFactory;
+let databaseProvider: AmazonDatabaseFactory;
 let authService: AuthenticationService;
 
 export const handler = async(request: TweeterRequest): Promise<TweeterResponse> => {
@@ -12,7 +12,7 @@ export const handler = async(request: TweeterRequest): Promise<TweeterResponse> 
     checkAuthorizationHelper(request);
 
     if (!databaseProvider) {
-        databaseProvider = new DynamoDatabaseFactory();
+        databaseProvider = new AmazonDatabaseFactory();
         authService = new AuthenticationService(databaseProvider);
     }
 

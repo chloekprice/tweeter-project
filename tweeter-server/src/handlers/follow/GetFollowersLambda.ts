@@ -1,9 +1,9 @@
 import { PagedItemRequest, PagedItemResponse, UserDto } from "tweeter-shared";
 import FollowService from "../../services/FollowService";
 import { helper } from "../../utils/GetItemsHelper"
-import { DynamoDatabaseFactory } from "../../daos/AmazonDatabaseFactory";
+import { AmazonDatabaseFactory } from "../../daos/AmazonDatabaseFactory";
 
-const databaseProvider: DynamoDatabaseFactory = new DynamoDatabaseFactory();
+const databaseProvider: AmazonDatabaseFactory = new AmazonDatabaseFactory();
 const followService = new FollowService(databaseProvider);
 
 export const handler = async (request: PagedItemRequest<UserDto>): Promise<PagedItemResponse<UserDto>> => {

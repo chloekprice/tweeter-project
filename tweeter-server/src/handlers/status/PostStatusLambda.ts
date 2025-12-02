@@ -2,9 +2,9 @@ import { PostStatusRequest, TweeterResponse } from "tweeter-shared";
 import { checkAuthorizationHelper } from "../../utils/CheckAuthorizationHelper";
 import { checkRequestHelper } from "../../utils/CheckRequestHelper";
 import PostService from "../../services/PostService";
-import { DynamoDatabaseFactory } from "../../daos/AmazonDatabaseFactory";
+import { AmazonDatabaseFactory } from "../../daos/AmazonDatabaseFactory";
 
-const databaseProvider: DynamoDatabaseFactory = new DynamoDatabaseFactory();
+const databaseProvider: AmazonDatabaseFactory = new AmazonDatabaseFactory();
 const postService: PostService = new PostService(databaseProvider);
 
 export const handler = async(request: PostStatusRequest): Promise<TweeterResponse> => {
