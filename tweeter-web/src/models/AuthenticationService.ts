@@ -11,14 +11,17 @@ class AuthenticationService {
     }
 
     public async login(alias: string, password: string): Promise<[User, AuthToken]>  {
-        return await this.serverFacade.loginUser({ alias: alias, password: password })
+        const handledAlias = `@${alias}`
+        return await this.serverFacade.loginUser({ alias: handledAlias, password: password })
     }
 
     public async register(firstName: string, lastName: string, alias: string, password: string, userImageBytes: Uint8Array, imageFileExtension: string): Promise<[User, AuthToken]> {
+        const handledAlias = `@${alias}`
+        
         const imageStringBase64: string = Buffer.from(userImageBytes).toString("base64");
         const imageUrl = `data:image/${imageFileExtension};base64,${imageStringBase64}`;
         
-        return await this.serverFacade.registerUser({ firstName: firstName, lastName: lastName, alias: alias, password: password, imageUrl: imageUrl});
+        return await this.serverFacade.registerUser({ firstName: firstName, lastName: lastName, alias: handledAlias, password: password, imageUrl: imageUrl});
     }
 }
 

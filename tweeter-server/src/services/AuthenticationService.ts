@@ -44,7 +44,8 @@ class AuthenticationService {
     }
 
     public async register(firstName: string, lastName: string, alias: string, password: string, profileImage: string): Promise<[UserDto, AuthTokenDto]> {
-        const profileImageUrl = await this.imagesProvider.putImage(`${alias}/profile`, profileImage);
+        const username = alias.startsWith("@") ? alias.slice(1) : alias;
+        const profileImageUrl = await this.imagesProvider.putImage(`${username}/profile`, profileImage);
         
         const hashedPassword = await bcrypt.hash(password, this.SALT_ROUNDS);
         const newUser = new User(alias, firstName, lastName, hashedPassword, profileImageUrl);
