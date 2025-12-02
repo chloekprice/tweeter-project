@@ -34,6 +34,12 @@ class AuthenticationService extends Service {
 
     public async register(firstName: string, lastName: string, alias: string, password: string, profileImage: string): Promise<[UserDto, AuthTokenDto]> {
         return await this.performThrowingFunction<[UserDto, AuthTokenDto]>(async() => {
+            const user = await Service.usersProvider.getUser(alias);
+
+            if (user != null) {
+                throw new Error(`A user with alias ${alias} already exists`);
+            }
+            
             const username = alias.startsWith("@") ? alias.slice(1) : alias;
             const profileImageUrl = await Service.imagesProvider.putImage(`${username}/profile`, profileImage);
             
