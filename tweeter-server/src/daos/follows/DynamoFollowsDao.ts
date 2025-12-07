@@ -91,33 +91,6 @@ export class DynamoFollowsDao implements FollowsDao {
         );
     }
 
-    async getFolloweeCount(alias: string): Promise<number> {
-        const params: QueryCommandInput = {
-            TableName: this.tableName,
-            KeyConditionExpression: `${this.followerHandleAttr} = :alias`,
-            ExpressionAttributeValues: { ":alias": alias },
-            Select: "COUNT",
-        };
-
-        const result = await this.client.send(new QueryCommand(params));
-
-        return result.Count ?? 0;
-    }
-
-    async getFollowerCount(alias: string): Promise<number> {
-        const params: QueryCommandInput = {
-            TableName: this.tableName,
-            IndexName: this.indexName,
-            KeyConditionExpression: `${this.followeeHandleAttr} = :alias`,
-            ExpressionAttributeValues: { ":alias": alias },
-            Select: "COUNT",
-        };
-
-        const result = await this.client.send(new QueryCommand(params));
-
-        return result.Count ?? 0;
-    }
-
     async getFollowers(alias: string): Promise<string[]> {
         const params: QueryCommandInput = {
             TableName: this.tableName,

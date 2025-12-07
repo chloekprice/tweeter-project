@@ -1,10 +1,10 @@
 
 export class Count {
     userAlias: string; // PK
-    followerCount: number;
     followeeCount: number;
+    followerCount: number;
 
-    public constructor(userAlias: string, followerCount: number, followeeCount: number) {
+    public constructor(userAlias: string, followeeCount: number, followerCount: number) {
         this.userAlias = userAlias;
         this.followeeCount = followeeCount;
         this.followerCount = followerCount;

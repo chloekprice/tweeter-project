@@ -14,6 +14,8 @@ import { DynamoUsersDao } from "./users/DynamoUsersDao";
 import { UsersDao } from "./users/UsersDao";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { S3Client } from "@aws-sdk/client-s3";
+import { CountsDao } from "./counts/CountsDao";
+import { DynamoCountsDao } from "./counts/DynamoCountsDao";
 
 
 export class AmazonDatabaseFactory implements DatabaseFactory {
@@ -21,6 +23,9 @@ export class AmazonDatabaseFactory implements DatabaseFactory {
     private readonly dynamoClient = DynamoDBDocumentClient.from(new DynamoDBClient());
     private readonly s3Client = new S3Client({ region: this.region });
 
+    createCountsDao(): CountsDao {
+        return new DynamoCountsDao(this.dynamoClient);
+    }
 
     createFeedsDao(): FeedsDao {
         return new DynamoFeedsDao(this.dynamoClient);
