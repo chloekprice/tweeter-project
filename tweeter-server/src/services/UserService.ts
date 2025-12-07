@@ -9,18 +9,24 @@ class UserService extends Service {
     public async follow(token: string, userToFollow: string): Promise<[followerCount: number, followeeCount: number]>  {
         return this.updateFollowStatus(token, userToFollow, async (newFollow) => {
             await Service.followsProvider.addFollow(newFollow);
+            await Service.countsProvider.updateFolloweeCount(newFollow.followerHandle, true);
+            await Service.countsProvider.updateFollowerCount(userToFollow, true);
         })
     };
 
     public async getFolloweeCount (token: string, userAlias: string): Promise<number> {
         return await this.performAuthorizedThrowingFunction<number>(token, async () => {
-            return await Service.followsProvider.getFolloweeCount(userAlias);
+            const followingCounts = await Service.countsProvider.getCount(userAlias);
+            if (typeof followingCounts === "undefined") { return 0; }
+            return followingCounts.followeeCount;
         });
     };
 
     public async getFollowerCount (token: string, userAlias: string): Promise<number> {
         return await this.performAuthorizedThrowingFunction<number>(token, async () => {
-            return await Service.followsProvider.getFollowerCount(userAlias);
+            const followingCounts = await Service.countsProvider.getCount(userAlias);
+            if (typeof followingCounts === "undefined") { return 0; }
+            return followingCounts.followerCount;
         });
     };
 
@@ -41,6 +47,8 @@ class UserService extends Service {
     public async unfollow(token: string, userToUnfollow: string): Promise<[followerCount: number, followeeCount: number]> {
         return this.updateFollowStatus(token, userToUnfollow, async (oldFollow) => {
             await Service.followsProvider.deleteFollow(oldFollow);
+            await Service.countsProvider.updateFolloweeCount(oldFollow.followerHandle, false);
+            await Service.countsProvider.updateFollowerCount(userToUnfollow, false);
         })
     };
 

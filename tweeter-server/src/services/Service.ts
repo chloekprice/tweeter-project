@@ -1,3 +1,4 @@
+import { CountsDao } from "../daos/counts/CountsDao";
 import { DatabaseFactory } from "../daos/DatabaseFactory";
 import { FeedsDao } from "../daos/feeds/FeedsDao";
 import { FollowsDao } from "../daos/follows/FollowsDao";
@@ -7,6 +8,7 @@ import { StatusesDao } from "../daos/statuses/StatusesDao";
 import { UsersDao } from "../daos/users/UsersDao";
 
 export class Service {
+    protected static countsProvider: CountsDao;
     protected static feedsProvider: FeedsDao;
     protected static followsProvider: FollowsDao
     protected static imagesProvider: ImagesDao;
@@ -15,6 +17,7 @@ export class Service {
     protected static usersProvider: UsersDao;
     
     constructor(daoProvider: DatabaseFactory) {
+        Service.countsProvider = daoProvider.createCountsDao();
         Service.feedsProvider = daoProvider.createFeedsDao();
         Service.followsProvider = daoProvider.createFollowsDao();
         Service.imagesProvider = daoProvider.createImagesDao();

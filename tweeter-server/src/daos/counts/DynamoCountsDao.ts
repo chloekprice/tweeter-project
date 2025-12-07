@@ -50,28 +50,24 @@ export class DynamoCountsDao implements CountsDao  {
         );
     }
 
-    async updateFolloweeCount(count: Count, isIncreasing: boolean): Promise<void> {
-        const increaseValue = isIncreasing ? "1" : "-1"
-
+    async updateFolloweeCount(alias: string, isIncreasing: boolean): Promise<void> {
         const params = {
             TableName: this.tableName,
-            Key: { [this.aliasAttr]: count.userAlias },
-            ExpressionAttributeNames: { "count": this.followeeCountAttr },
+            Key: { [this.aliasAttr]: alias },
+            ExpressionAttributeNames: { "#count": this.followeeCountAttr },
             UpdateExpression: "ADD #count :inc",
-            ExpressionAttributeValues: { ":inc": { N: increaseValue } }
+            ExpressionAttributeValues: { ":inc": isIncreasing ? 1 : -1 }
         };
         await this.client.send(new UpdateCommand(params));
     }
 
-    async updateFollowerCount(count: Count, isIncreasing: boolean): Promise<void> {
-        const increaseValue = isIncreasing ? "1" : "-1"
-        
+    async updateFollowerCount(alias: string, isIncreasing: boolean): Promise<void> {        
         const params = {
             TableName: this.tableName,
-            Key: { [this.aliasAttr]: count.userAlias },
-            ExpressionAttributeNames: { "count": this.followerCountAttr },
+            Key: { [this.aliasAttr]: alias },
+            ExpressionAttributeNames: { "#count": this.followerCountAttr },
             UpdateExpression: "ADD #count :inc",
-            ExpressionAttributeValues: { ":inc": { N: increaseValue } }
+            ExpressionAttributeValues: { ":inc": isIncreasing ? 1 : -1 }
         };
         await this.client.send(new UpdateCommand(params));
     }
