@@ -22,9 +22,6 @@ class PostService extends Service {
             const currentUser = await Service.usersProvider.getUser(userAlias);
             const followers = await Service.followsProvider.getFollowers(userAlias);
 
-            const newFeedPost = new Feed(userAlias, {...currentUser!}, newPost.timestamp, {...newPost});
-            await Service.feedsProvider.addToFeed({...newFeedPost});
-
             followers.forEach( async(follower) => {
                 let feedPost = new Feed(follower, {...currentUser!}, newPost.timestamp, {...newPost});
                 await Service.feedsProvider.addToFeed({...feedPost});
