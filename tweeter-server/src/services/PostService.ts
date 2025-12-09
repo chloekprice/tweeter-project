@@ -2,7 +2,6 @@ import { StatusDto } from "tweeter-shared";
 import { Status } from "../entities/Status";
 import { Segment } from "../entities/Segment";
 import { Service } from "./Service";
-import { User } from "../entities/User";
 import { Feed } from "../entities/Feed";
 
 class PostService extends Service {
