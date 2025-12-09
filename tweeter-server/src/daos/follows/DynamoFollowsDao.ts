@@ -92,22 +92,23 @@ export class DynamoFollowsDao implements FollowsDao {
     }
 
     async getFollowers(alias: string): Promise<string[]> {
-        const params: QueryCommandInput = {
-            TableName: this.tableName,
-            IndexName: this.indexName, // GSI
-            KeyConditionExpression: `${this.followeeHandleAttr} = :alias`,
-            ExpressionAttributeValues: { ":alias": alias }
-        };
-
         const items: string[] = [];
-        const result = await this.client.send(new QueryCommand(params));
+        let lastKey: Record<string, any> | undefined = undefined;
+        const pageSize = 1000;
 
-        result.Items?.forEach( (item) =>
-            items.push(item[this.followerHandleAttr] ?? "")
-        )
+        do {
+            const [values, newLastKey] = await this.getPageOfFollowerAliases(alias, pageSize, lastKey);
+
+            values.forEach((follow) => {
+                items.push(follow.followerHandle);
+            });
+
+            lastKey = newLastKey;
+        } while (lastKey !== undefined);
 
         return items;
     }
+
 
     async getPageOfFollowees(followerHandle: string, pageSize: number, lastFolloweeHandle: string | undefined): Promise<DataPage<Follow>> {
         const params = {
@@ -148,6 +149,20 @@ export class DynamoFollowsDao implements FollowsDao {
        return this.getPageOfUsers(params);
     }
 
+    async getPageOfFollowerAliases(followeeHandle: string, pageSize: number, lastKey: Record<string, any> | undefined): Promise<[Follow[], Record<string, any> | undefined]> {
+        const params = {
+            TableName: this.tableName,
+            IndexName: this.indexName, // GSI
+            KeyConditionExpression: `${this.followeeHandleAttr} = :followee`,
+            ExpressionAttributeValues: {
+                ":followee": followeeHandle,
+            },
+            Limit: pageSize,
+            ExclusiveStartKey: lastKey, // pass the full key object directly
+        };
+
+        return this.getPage(params);
+    }
 
 
     private generateFollowItem(follow: Follow) {
@@ -157,27 +172,37 @@ export class DynamoFollowsDao implements FollowsDao {
         };
     }
 
-    private async getPageOfUsers(parameters: FollowParams): Promise<DataPage<Follow>> {
+    private async getPage(parameters: FollowParams): Promise<[Follow[], Record<string, any> | undefined]> {
         const items: Follow[] = [];
         const data = await this.client.send(new QueryCommand(parameters));
 
-        data.Items?.forEach( (item) =>
-            items.push(new Follow(
-                item[this.followeeHandleAttr] ?? "",
-                item[this.followeeFirstNameAttr] ?? "",
-                item[this.followeeLastNameAttr] ?? "",
-                item[this.followeeImageUrlAttr] ?? "",
-                item[this.followerHandleAttr] ?? "",
-                item[this.followerFirstNameAttr] ?? "",
-                item[this.followerLastNameAttr] ?? "",
-                item[this.followerImageUrlAttr] ?? ""
-            ))
-        )
+        data.Items?.forEach((item) =>
+            items.push(
+                new Follow(
+                    item[this.followeeHandleAttr] ?? "",
+                    item[this.followeeFirstNameAttr] ?? "",
+                    item[this.followeeLastNameAttr] ?? "",
+                    item[this.followeeImageUrlAttr] ?? "",
+                    item[this.followerHandleAttr] ?? "",
+                    item[this.followerFirstNameAttr] ?? "",
+                    item[this.followerLastNameAttr] ?? "",
+                    item[this.followerImageUrlAttr] ?? ""
+                )
+            )
+        );
 
-        const hasMorePages = data.LastEvaluatedKey !== undefined;
+        return [items, data.LastEvaluatedKey];
+    }
+
+
+    private async getPageOfUsers(parameters: FollowParams): Promise<DataPage<Follow>> {
+        const [items, lastKey] = await this.getPage(parameters);
+
+        const hasMorePages = lastKey !== undefined;
 
         return new DataPage<Follow>(items, hasMorePages);
     }
+
 
     private async putFollow(follow: Follow): Promise<void> {
         const params = {

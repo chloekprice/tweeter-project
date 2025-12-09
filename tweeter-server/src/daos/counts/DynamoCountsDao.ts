@@ -1,9 +1,7 @@
 import {
-  DeleteCommand,
   DynamoDBDocumentClient,
   GetCommand,
   PutCommand,
-  QueryCommand,
   UpdateCommand
 } from "@aws-sdk/lib-dynamodb";
 import { CountsDao } from "./CountsDao";
