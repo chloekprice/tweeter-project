@@ -1,4 +1,5 @@
 import {
+    BatchWriteCommand,
   DynamoDBDocumentClient,
   PutCommand,
   QueryCommand,
@@ -17,8 +18,47 @@ export class DynamoFeedsDao implements FeedsDao {
 
     private readonly client;
 
+    readonly batchSize = 25;
+
     public constructor(client: DynamoDBDocumentClient) {
         this.client = client;
+    }
+
+
+    async batchAddToFeed(feedPosts: Feed[]): Promise<void> {
+        for (let i = 0; i < feedPosts.length; i += this.batchSize) {
+            const chunk = feedPosts.slice(i, i + this.batchSize);
+
+            const requestItems = chunk.map(feedPost => ({
+                PutRequest: {
+                    Item: {
+                        [this.userAliasAttr]: feedPost.userAlias,
+                        [this.userAttr]: feedPost.user,
+                        [this.timestampAttr]: feedPost.timestamp,
+                        [this.statusAttr]: feedPost.status
+                    }
+                }
+            }));
+
+            const params = {
+                RequestItems: {
+                    [this.tableName]: requestItems
+                }
+            };
+
+            let response = await this.client.send(new BatchWriteCommand(params));
+
+            // Retry any unprocessed items (DynamoDB throttling happens)
+            while (response.UnprocessedItems && 
+                Object.keys(response.UnprocessedItems).length > 0) {
+
+                console.warn("Retrying unprocessed feed items...");
+
+                response = await this.client.send(new BatchWriteCommand({
+                    RequestItems: response.UnprocessedItems
+                }));
+            }
+        }
     }
 
 

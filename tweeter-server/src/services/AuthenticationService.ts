@@ -3,6 +3,7 @@ import { Session } from "../entities/Session";
 import { User } from "../entities/User";
 import bcrypt from "bcryptjs";
 import { Service } from "./Service";
+import { Count } from "../entities/Count";
 
 
 class AuthenticationService extends Service {
@@ -46,6 +47,9 @@ class AuthenticationService extends Service {
             const hashedPassword = await bcrypt.hash(password, this.SALT_ROUNDS);
             const newUser = new User(alias, firstName, lastName, hashedPassword, profileImageUrl);
             await Service.usersProvider.addUser(newUser);
+
+            const followingCounts = new Count(alias, 0, 0);
+            await Service.countsProvider.addCount(followingCounts);
             
             return await this.createDtos(newUser);
         });

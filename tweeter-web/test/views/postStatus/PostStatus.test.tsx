@@ -27,7 +27,7 @@ describe("Post Status View", () => {
         (useUserInfo as jest.Mock).mockReturnValue({
             currentUser: mockUserInstance,
             authToken: mockAuthTokenInstance,
-});      
+        });      
     })
 
     it("first renders the Post Status and Clear buttons as disabled", () => {
