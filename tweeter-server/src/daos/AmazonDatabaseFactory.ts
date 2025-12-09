@@ -16,11 +16,16 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { S3Client } from "@aws-sdk/client-s3";
 import { CountsDao } from "./counts/CountsDao";
 import { DynamoCountsDao } from "./counts/DynamoCountsDao";
+import { SQSClient } from "@aws-sdk/client-sqs";
+import { QueueDao } from "./messaging/QueueDao";
+import { SqsQueueDao } from "./messaging/SqsQueueDao";
 
 
 export class AmazonDatabaseFactory implements DatabaseFactory {
     readonly region = "us-east-1"
+
     private readonly dynamoClient = DynamoDBDocumentClient.from(new DynamoDBClient());
+    private readonly sqsClient = new SQSClient();
     private readonly s3Client = new S3Client({ region: this.region });
 
     createCountsDao(): CountsDao {
@@ -37,6 +42,10 @@ export class AmazonDatabaseFactory implements DatabaseFactory {
 
     createImagesDao(): ImagesDao {
         return new S3ImagesDao(this.s3Client);
+    }
+
+    createMessagingQueue(): QueueDao {
+        return new SqsQueueDao(this.sqsClient);
     }
 
     createSessionsDao(): SessionsDao {
