@@ -49,10 +49,15 @@ class PostService extends Service {
         await this.performThrowingFunction( async () => {
             const postInfo = JSON.parse(postPayload) as WorkerMessage;
 
-            for (let i = 0; i < postInfo.followerAliases.length; i++) {
-                let feedPost = new Feed(postInfo.followerAliases[i], postInfo.postAuthor, postInfo.postStatus.timestamp, postInfo.postStatus);
-                await Service.feedsProvider.addToFeed({...feedPost});
-            }
+            const author = postInfo.postAuthor;
+            const status = postInfo.postStatus;
+            const timestamp = status.timestamp
+
+            const feedPosts = postInfo.followerAliases.map ( followerAlias =>
+                new Feed(followerAlias, author, timestamp, status)
+            );
+
+            await Service.feedsProvider.batchAddToFeed(feedPosts);
         })
     }
 
