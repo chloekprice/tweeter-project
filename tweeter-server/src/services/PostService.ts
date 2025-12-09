@@ -11,12 +11,13 @@ export interface FanoutMessage {
 }
 
 export interface WorkerMessage {
-    followerAlias: string,
+    followerAliases: string[],
     postAuthor: User,
     postStatus: Status
 }
 
 class PostService extends Service {
+    readonly batchSize = 250;
 
 
     public async postStatus(token: string, userAlias: string, newStatus: StatusDto): Promise<void> {
@@ -48,8 +49,10 @@ class PostService extends Service {
         await this.performThrowingFunction( async () => {
             const postInfo = JSON.parse(postPayload) as WorkerMessage;
 
-            let feedPost = new Feed(postInfo.followerAlias, postInfo.postAuthor, postInfo.postStatus.timestamp, postInfo.postStatus);
-            await Service.feedsProvider.addToFeed({...feedPost});
+            for (let i = 0; i < postInfo.followerAliases.length; i++) {
+                let feedPost = new Feed(postInfo.followerAliases[i], postInfo.postAuthor, postInfo.postStatus.timestamp, postInfo.postStatus);
+                await Service.feedsProvider.addToFeed({...feedPost});
+            }
         })
     }
 
@@ -59,17 +62,19 @@ class PostService extends Service {
 
             const followers = await Service.followsProvider.getFollowers(postInfo.postAuthor.alias);
 
-            followers.forEach( async(follower) => {
+            for (let i =0; i < followers.length; i += this.batchSize) {
+                const chunk = followers.slice(i, i + this.batchSize);
+
                 // push message to update feed
                 const payload: WorkerMessage = {
-                    followerAlias: follower,
+                    followerAliases: chunk,
                     postAuthor: postInfo.postAuthor,
                     postStatus: postInfo.postStatus,
                 };
                 const payloadMessage = JSON.stringify(payload);
 
                 await Service.queueProvider.sendWorkerMessage(payloadMessage);
-            });
+            }
         })
     }
 }

@@ -2,7 +2,7 @@ import { SendMessageCommand, SQSClient } from "@aws-sdk/client-sqs";
 import { QueueDao } from "./QueueDao";
 
 export class SqsQueueDao implements QueueDao {
-    readonly delaySeconds = 10;
+    readonly delaySeconds = 0;
     readonly fanoutUrl = "https://sqs.us-east-1.amazonaws.com/123398428865/PostUserStatusQueue"
     readonly workerUrl = "https://sqs.us-east-1.amazonaws.com/123398428865/UpdateFeedsQueue"
 
@@ -32,6 +32,7 @@ export class SqsQueueDao implements QueueDao {
         try {
             await this.client.send(messageCommand);
         } catch (error) {
+            console.log(`there was an error: ${error}`);
             throw Error("Internal Server Error: failed to send message to queue: " + error);
         }
     }
