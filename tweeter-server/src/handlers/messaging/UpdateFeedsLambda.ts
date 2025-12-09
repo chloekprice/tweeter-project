@@ -1,8 +1,13 @@
+import { AmazonDatabaseFactory } from "../../daos/AmazonDatabaseFactory";
+import PostService from "../../services/PostService";
+
+const databaseProvider: AmazonDatabaseFactory = new AmazonDatabaseFactory();
+const postService = new PostService(databaseProvider);
 
 export const handler = async function (event: any) {
     for (let i = 0; i < event.Records.length; ++i) {
         const { body } = event.Records[i];
-        console.log(`Handling message: ${body}`);
+        await postService.postStatusToFeed(body);
     }
     return null;
 };
